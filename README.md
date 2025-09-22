@@ -238,5 +238,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made for the web development community**#   B a s e l i n e - S i d e k i c k  
+**Made for the web development community**#   B a s e l i n e - S i d e k i c k 
+ 
  
