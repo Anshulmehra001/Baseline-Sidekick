@@ -1,0 +1,102 @@
+{
+  "name": "baseline-sidekick",
+  "displayName": "Baseline Sidekick",
+  "description": "VS Code extension that helps identify web platform features not part of the Baseline standard",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:css",
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:html"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "baseline.auditWorkspace",
+        "title": "Audit Workspace for Baseline Compatibility",
+        "category": "Baseline"
+      }
+    ],
+    "configuration": {
+      "title": "Baseline Sidekick",
+      "properties": {
+        "baselineSidekick.performance.debounceDelay": {
+          "type": "number",
+          "default": 300,
+          "minimum": 50,
+          "maximum": 2000,
+          "description": "Debounce delay for diagnostic updates in milliseconds"
+        },
+        "baselineSidekick.performance.maxFileSize": {
+          "type": "number",
+          "default": 5242880,
+          "minimum": 1024,
+          "description": "Maximum file size to analyze in bytes (default: 5MB)"
+        },
+        "baselineSidekick.performance.maxCacheSize": {
+          "type": "number",
+          "default": 10000,
+          "minimum": 100,
+          "maximum": 100000,
+          "description": "Maximum number of items to cache for performance"
+        },
+        "baselineSidekick.performance.parseTimeout": {
+          "type": "number",
+          "default": 5000,
+          "minimum": 1000,
+          "maximum": 30000,
+          "description": "Timeout for parsing operations in milliseconds"
+        },
+        "baselineSidekick.performance.maxAnalysisDepth": {
+          "type": "number",
+          "default": 50,
+          "minimum": 10,
+          "maximum": 200,
+          "description": "Maximum analysis depth for nested structures"
+        },
+        "baselineSidekick.performance.enableAsyncProcessing": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable asynchronous processing for large files"
+        },
+        "baselineSidekick.performance.largeFileThreshold": {
+          "type": "number",
+          "default": 102400,
+          "minimum": 1024,
+          "description": "Threshold for considering a file 'large' in bytes (default: 100KB)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "vitest --run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/babel__parser": "^7.0.0",
+    "@types/babel__traverse": "^7.28.0",
+    "@types/node": "^18.0.0",
+    "@types/parse5": "^6.0.3",
+    "@types/vscode": "^1.74.0",
+    "typescript": "^4.9.4",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.28.4",
+    "@babel/traverse": "^7.28.4",
+    "parse5": "^8.0.0",
+    "postcss": "^8.5.6",
+    "web-features": "^3.0.0"
+  }
+}
