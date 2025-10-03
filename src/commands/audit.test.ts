@@ -39,6 +39,19 @@ vi.mock('vscode', () => ({
 // Mock BaselineDataManager
 vi.mock('../core/baselineData');
 
+// Mock PerformanceOptimizer
+vi.mock('../core/performanceOptimizer', () => ({
+  PerformanceOptimizer: {
+    getInstance: vi.fn(() => ({
+      shouldProcessFile: vi.fn().mockReturnValue(true),
+      memoize: vi.fn((fn: any) => fn), // Return unwrapped function for testing
+      withTimeout: vi.fn((fn: any) => fn()), // Execute immediately for testing
+      trackMemoryUsage: vi.fn(),
+      releaseMemoryTracking: vi.fn()
+    }))
+  }
+}));
+
 // Mock parsers
 vi.mock('../core/cssParser', () => ({
   CssParser: {

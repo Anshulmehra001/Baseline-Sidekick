@@ -75,9 +75,14 @@ class BaselineDataManager {
             // Load the web-features data - the features are in the 'features' property
             this.featuresData = webFeatures.features;
             this.isLoaded = true;
-            // Log success using Logger instead of ErrorHandler
-            const logger = require('./errorHandler').Logger.getInstance();
-            logger.info('Web-features data loaded successfully');
+            // Log success using Logger
+            try {
+                const { Logger } = await Promise.resolve().then(() => __importStar(require('./errorHandler')));
+                Logger.getInstance().info('Web-features data loaded successfully');
+            }
+            catch {
+                // Ignore logging failure in test environments
+            }
         }
         catch (error) {
             const errorMessage = error instanceof Error ? error : new Error('Unknown error loading web-features data');

@@ -61,6 +61,14 @@ export class DiagnosticController {
   }
 
   /**
+   * Updates diagnostics immediately (for testing purposes)
+   * @param document VS Code text document to analyze
+   */
+  public async updateDiagnosticsImmediate(document: vscode.TextDocument): Promise<void> {
+    return this.updateDiagnosticsInternal(document);
+  }
+
+  /**
    * Internal method that performs the actual diagnostic update
    * @param document VS Code text document to analyze
    */
@@ -194,6 +202,12 @@ export class DiagnosticController {
       // Parse CSS content to extract features and their locations
       const parseResult = memoizedParser(content, document);
       
+      // Ensure parseResult is valid
+      if (!parseResult || !parseResult.features) {
+        this.logger.warn(`CSS parser returned invalid result for ${document.uri.fsPath}`);
+        return;
+      }
+      
       // Check each feature for Baseline compatibility
       for (const featureId of parseResult.features) {
         const isSupported = this.baselineDataManager.isBaselineSupported(featureId);
@@ -274,6 +288,12 @@ export class DiagnosticController {
       // Parse JavaScript content to extract features and their locations
       const parseResult = memoizedParser(content, document);
       
+      // Ensure parseResult is valid
+      if (!parseResult || !parseResult.features) {
+        this.logger.warn(`JavaScript parser returned invalid result for ${document.uri.fsPath}`);
+        return;
+      }
+      
       // Check each feature for Baseline compatibility
       for (const featureId of parseResult.features) {
         const isSupported = this.baselineDataManager.isBaselineSupported(featureId);
@@ -353,6 +373,12 @@ export class DiagnosticController {
       
       // Parse HTML content to extract features and their locations
       const parseResult = memoizedParser(content, document);
+      
+      // Ensure parseResult is valid
+      if (!parseResult || !parseResult.features) {
+        this.logger.warn(`HTML parser returned invalid result for ${document.uri.fsPath}`);
+        return;
+      }
       
       // Check each feature for Baseline compatibility
       for (const featureId of parseResult.features) {

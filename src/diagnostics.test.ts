@@ -36,11 +36,14 @@ vi.mock('vscode', () => ({
       appendLine: vi.fn(),
       show: vi.fn(),
       dispose: vi.fn()
-    }))
+    })),
+    showErrorMessage: vi.fn().mockResolvedValue(undefined),
+    showWarningMessage: vi.fn().mockResolvedValue(undefined),
+    showInformationMessage: vi.fn().mockResolvedValue(undefined)
   },
   workspace: {
     getConfiguration: vi.fn(() => ({
-      get: vi.fn((key: string, defaultValue: any) => defaultValue)
+      get: vi.fn((_key: string, defaultValue: any) => defaultValue)
     }))
   }
 }));
@@ -57,29 +60,75 @@ vi.mock('./core/baselineData', () => ({
   }
 }));
 
+// Mock PerformanceOptimizer
+vi.mock('./core/performanceOptimizer', () => ({
+  PerformanceOptimizer: {
+    getInstance: vi.fn(() => ({
+      shouldProcessFile: vi.fn().mockReturnValue(true),
+      debounce: vi.fn((key: string, fn: any) => fn), // Return unwrapped function for testing
+      memoize: vi.fn((fn: any) => fn), // Return unwrapped function for testing
+      withTimeout: vi.fn((fn: any) => fn()), // Execute immediately for testing
+      trackMemoryUsage: vi.fn(),
+      releaseMemoryTracking: vi.fn(),
+      isLargeFile: vi.fn().mockReturnValue(false),
+      getConfiguration: vi.fn().mockReturnValue({
+        parseTimeout: 5000,
+        maxFileSize: 5 * 1024 * 1024
+      }),
+      dispose: vi.fn() // Add dispose method
+    }))
+  }
+}));
+
+// Mock ErrorHandler
+vi.mock('./core/errorHandler', () => ({
+  ErrorHandler: {
+    getInstance: vi.fn(() => ({
+      handleExtensionError: vi.fn(),
+      handleParserError: vi.fn()
+    }))
+  },
+  Logger: {
+    getInstance: vi.fn(() => ({
+      debug: vi.fn(),
+      warn: vi.fn(),
+      info: vi.fn()
+    }))
+  }
+}));
+
 // Mock parsers
 vi.mock('./core/cssParser', () => ({
   CssParser: {
-    parseCss: vi.fn()
+    parseCss: vi.fn().mockReturnValue({
+      features: [],
+      locations: new Map()
+    })
   }
 }));
 
 vi.mock('./core/jsParser', () => ({
   JsParser: {
-    parseJavaScript: vi.fn()
+    parseJavaScript: vi.fn().mockReturnValue({
+      features: [],
+      locations: new Map()
+    })
   }
 }));
 
 vi.mock('./core/htmlParser', () => ({
   HtmlParser: {
-    parseHtml: vi.fn()
+    parseHtml: vi.fn().mockReturnValue({
+      features: [],
+      locations: new Map()
+    })
   }
 }));
 
 describe('DiagnosticController', () => {
   let diagnosticController: DiagnosticController;
   let mockContext: vscode.ExtensionContext;
-  let mockDocument: vscode.TextDocument;
+  let mockDocument: any;
   let mockBaselineDataManager: any;
   let mockDiagnosticCollection: any;
 
@@ -117,7 +166,7 @@ describe('DiagnosticController', () => {
       uri: { toString: () => 'file:///test.css' },
       getText: vi.fn().mockReturnValue('body { gap: 10px; }'),
       languageId: 'css'
-    } as any;
+    };
 
     diagnosticController = new DiagnosticController(mockContext);
   });
@@ -140,13 +189,13 @@ describe('DiagnosticController', () => {
     it('should initialize baseline data manager if not initialized', async () => {
       mockBaselineDataManager.isInitialized.mockReturnValue(false);
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(mockDocument);
 
       expect(mockBaselineDataManager.initialize).toHaveBeenCalled();
     });
 
     it('should clear existing diagnostics for document', async () => {
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(mockDocument);
 
       expect(mockDiagnosticCollection.delete).toHaveBeenCalledWith(mockDocument.uri);
     });
@@ -156,7 +205,7 @@ describe('DiagnosticController', () => {
       mockBaselineDataManager.initialize.mockRejectedValue(new Error('Init failed'));
 
       // Should not throw
-      await expect(diagnosticController.updateDiagnostics(mockDocument)).resolves.toBeUndefined();
+      await expect(diagnosticController.updateDiagnosticsImmediate(mockDocument)).resolves.toBeUndefined();
     });
 
     it('should set diagnostics when non-Baseline features are found', async () => {
@@ -174,7 +223,7 @@ describe('DiagnosticController', () => {
         status: { baseline: false }
       });
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(mockDocument);
 
       expect(mockDiagnosticCollection.set).toHaveBeenCalledWith(
         mockDocument.uri,
@@ -203,7 +252,7 @@ describe('DiagnosticController', () => {
       // Mock baseline data manager to return feature as supported
       mockBaselineDataManager.isBaselineSupported.mockReturnValue(true);
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(mockDocument);
 
       expect(mockDiagnosticCollection.set).not.toHaveBeenCalled();
     });
@@ -221,27 +270,30 @@ describe('DiagnosticController', () => {
       
       mockBaselineDataManager.isBaselineSupported.mockReturnValue(false);
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(mockDocument);
 
       expect(CssParser.parseCss).toHaveBeenCalledWith('body { gap: 10px; }', mockDocument);
     });
 
     it('should analyze SCSS documents', async () => {
-      mockDocument.languageId = 'scss';
+      const scssDocument = { ...mockDocument, languageId: 'scss' };
       
       (CssParser.parseCss as Mock).mockReturnValue({
         features: [],
         locations: new Map()
       });
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(scssDocument);
 
       expect(CssParser.parseCss).toHaveBeenCalled();
     });
 
     it('should analyze JavaScript documents', async () => {
-      mockDocument.languageId = 'javascript';
-      mockDocument.getText = vi.fn().mockReturnValue('navigator.clipboard.writeText("test");');
+      const jsDocument = {
+        ...mockDocument,
+        languageId: 'javascript',
+        getText: vi.fn().mockReturnValue('navigator.clipboard.writeText("test");')
+      };
       
       const mockRange = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 17));
       
@@ -252,27 +304,30 @@ describe('DiagnosticController', () => {
       
       mockBaselineDataManager.isBaselineSupported.mockReturnValue(false);
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(jsDocument);
 
-      expect(JsParser.parseJavaScript).toHaveBeenCalledWith('navigator.clipboard.writeText("test");', mockDocument);
+      expect(JsParser.parseJavaScript).toHaveBeenCalledWith('navigator.clipboard.writeText("test");', jsDocument);
     });
 
     it('should analyze TypeScript documents', async () => {
-      mockDocument.languageId = 'typescript';
+      const tsDocument = { ...mockDocument, languageId: 'typescript' };
       
       (JsParser.parseJavaScript as Mock).mockReturnValue({
         features: [],
         locations: new Map()
       });
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(tsDocument);
 
       expect(JsParser.parseJavaScript).toHaveBeenCalled();
     });
 
     it('should analyze HTML documents', async () => {
-      mockDocument.languageId = 'html';
-      mockDocument.getText = vi.fn().mockReturnValue('<dialog>Content</dialog>');
+      const htmlDocument = {
+        ...mockDocument,
+        languageId: 'html',
+        getText: vi.fn().mockReturnValue('<dialog>Content</dialog>')
+      };
       
       const mockRange = new vscode.Range(new vscode.Position(0, 1), new vscode.Position(0, 7));
       
@@ -283,15 +338,15 @@ describe('DiagnosticController', () => {
       
       mockBaselineDataManager.isBaselineSupported.mockReturnValue(false);
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(htmlDocument);
 
-      expect(HtmlParser.parseHtml).toHaveBeenCalledWith('<dialog>Content</dialog>', mockDocument);
+      expect(HtmlParser.parseHtml).toHaveBeenCalledWith('<dialog>Content</dialog>', htmlDocument);
     });
 
     it('should handle unsupported language types', async () => {
-      mockDocument.languageId = 'python';
+      const pythonDocument = { ...mockDocument, languageId: 'python' };
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(pythonDocument);
 
       expect(CssParser.parseCss).not.toHaveBeenCalled();
       expect(JsParser.parseJavaScript).not.toHaveBeenCalled();
@@ -314,7 +369,7 @@ describe('DiagnosticController', () => {
         status: { baseline: false }
       });
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(mockDocument);
 
       const setCall = (mockDiagnosticCollection.set as Mock).mock.calls[0];
       const diagnostics = setCall[1] as EnhancedDiagnostic[];
@@ -347,7 +402,7 @@ describe('DiagnosticController', () => {
         status: { baseline: 'low' }
       });
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(mockDocument);
 
       const setCall = (mockDiagnosticCollection.set as Mock).mock.calls[0];
       const diagnostics = setCall[1] as EnhancedDiagnostic[];
@@ -367,7 +422,7 @@ describe('DiagnosticController', () => {
       mockBaselineDataManager.isBaselineSupported.mockReturnValue(false);
       mockBaselineDataManager.getFeatureData.mockReturnValue(undefined);
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(mockDocument);
 
       const setCall = (mockDiagnosticCollection.set as Mock).mock.calls[0];
       const diagnostics = setCall[1] as EnhancedDiagnostic[];
@@ -384,32 +439,32 @@ describe('DiagnosticController', () => {
       });
 
       // Should not throw
-      await expect(diagnosticController.updateDiagnostics(mockDocument)).resolves.toBeUndefined();
+      await expect(diagnosticController.updateDiagnosticsImmediate(mockDocument)).resolves.toBeUndefined();
       
       // Should still clear diagnostics
       expect(mockDiagnosticCollection.delete).toHaveBeenCalledWith(mockDocument.uri);
     });
 
     it('should handle JavaScript parser errors gracefully', async () => {
-      mockDocument.languageId = 'javascript';
+      const jsDocument = { ...mockDocument, languageId: 'javascript' };
       
       (JsParser.parseJavaScript as Mock).mockImplementation(() => {
         throw new Error('JS parse error');
       });
 
       // Should not throw
-      await expect(diagnosticController.updateDiagnostics(mockDocument)).resolves.toBeUndefined();
+      await expect(diagnosticController.updateDiagnosticsImmediate(jsDocument)).resolves.toBeUndefined();
     });
 
     it('should handle HTML parser errors gracefully', async () => {
-      mockDocument.languageId = 'html';
+      const htmlDocument = { ...mockDocument, languageId: 'html' };
       
       (HtmlParser.parseHtml as Mock).mockImplementation(() => {
         throw new Error('HTML parse error');
       });
 
       // Should not throw
-      await expect(diagnosticController.updateDiagnostics(mockDocument)).resolves.toBeUndefined();
+      await expect(diagnosticController.updateDiagnosticsImmediate(htmlDocument)).resolves.toBeUndefined();
     });
   });
 
@@ -458,7 +513,7 @@ describe('DiagnosticController', () => {
         status: { baseline: false }
       }));
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(mockDocument);
 
       const setCall = (mockDiagnosticCollection.set as Mock).mock.calls[0];
       const diagnostics = setCall[1] as EnhancedDiagnostic[];
@@ -485,14 +540,14 @@ describe('DiagnosticController', () => {
         status: { baseline: false }
       });
 
-      await diagnosticController.updateDiagnostics(mockDocument);
+      await diagnosticController.updateDiagnosticsImmediate(mockDocument);
 
       const setCall = (mockDiagnosticCollection.set as Mock).mock.calls[0];
       const diagnostics = setCall[1] as EnhancedDiagnostic[];
       
       expect(diagnostics).toHaveLength(2);
-      expect(diagnostics[0].range).toBe(mockRange1);
-      expect(diagnostics[1].range).toBe(mockRange2);
+      expect(diagnostics[0].range).toEqual(mockRange1);
+      expect(diagnostics[1].range).toEqual(mockRange2);
       expect(diagnostics[0].code.value).toBe('css.properties.gap');
       expect(diagnostics[1].code.value).toBe('css.properties.gap');
     });

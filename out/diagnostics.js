@@ -62,6 +62,13 @@ class DiagnosticController {
         this.debouncedUpdateDiagnostics(document);
     }
     /**
+     * Updates diagnostics immediately (for testing purposes)
+     * @param document VS Code text document to analyze
+     */
+    async updateDiagnosticsImmediate(document) {
+        return this.updateDiagnosticsInternal(document);
+    }
+    /**
      * Internal method that performs the actual diagnostic update
      * @param document VS Code text document to analyze
      */
@@ -169,6 +176,11 @@ class DiagnosticController {
             const memoizedParser = this.performanceOptimizer.memoize((content, document) => cssParser_1.CssParser.parseCss(content, document), (content, document) => `css-${document.uri.fsPath}-${this.hashContent(content)}`);
             // Parse CSS content to extract features and their locations
             const parseResult = memoizedParser(content, document);
+            // Ensure parseResult is valid
+            if (!parseResult || !parseResult.features) {
+                this.logger.warn(`CSS parser returned invalid result for ${document.uri.fsPath}`);
+                return;
+            }
             // Check each feature for Baseline compatibility
             for (const featureId of parseResult.features) {
                 const isSupported = this.baselineDataManager.isBaselineSupported(featureId);
@@ -220,6 +232,11 @@ class DiagnosticController {
             const memoizedParser = this.performanceOptimizer.memoize((content, document) => jsParser_1.JsParser.parseJavaScript(content, document), (content, document) => `js-${document.uri.fsPath}-${this.hashContent(content)}`);
             // Parse JavaScript content to extract features and their locations
             const parseResult = memoizedParser(content, document);
+            // Ensure parseResult is valid
+            if (!parseResult || !parseResult.features) {
+                this.logger.warn(`JavaScript parser returned invalid result for ${document.uri.fsPath}`);
+                return;
+            }
             // Check each feature for Baseline compatibility
             for (const featureId of parseResult.features) {
                 const isSupported = this.baselineDataManager.isBaselineSupported(featureId);
@@ -271,6 +288,11 @@ class DiagnosticController {
             const memoizedParser = this.performanceOptimizer.memoize((content, document) => htmlParser_1.HtmlParser.parseHtml(content, document), (content, document) => `html-${document.uri.fsPath}-${this.hashContent(content)}`);
             // Parse HTML content to extract features and their locations
             const parseResult = memoizedParser(content, document);
+            // Ensure parseResult is valid
+            if (!parseResult || !parseResult.features) {
+                this.logger.warn(`HTML parser returned invalid result for ${document.uri.fsPath}`);
+                return;
+            }
             // Check each feature for Baseline compatibility
             for (const featureId of parseResult.features) {
                 const isSupported = this.baselineDataManager.isBaselineSupported(featureId);

@@ -68,7 +68,7 @@ describe('Audit Integration Tests', () => {
   let mockToken: any;
   let mockBaselineDataManager: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
 
     // Mock extension context
@@ -184,7 +184,7 @@ describe('Audit Integration Tests', () => {
           return Promise.resolve({ uri: { fsPath: 'report.md' } });
         }
         // Return the appropriate mock document based on the URI
-        const uri = options || arguments[0];
+        const uri = options;
         return Promise.resolve(mockDocuments[uri.fsPath as keyof typeof mockDocuments]);
       });
 
@@ -290,7 +290,7 @@ describe('Audit Integration Tests', () => {
           // Report document
           return Promise.resolve({ uri: { fsPath: 'report.md' } });
         }
-        const uri = options || arguments[0];
+        const uri = options;
         return Promise.resolve(mockDocuments[uri.fsPath as keyof typeof mockDocuments]);
       });
 
@@ -432,7 +432,7 @@ describe('Audit Integration Tests', () => {
           reportContent = options.content;
           return Promise.resolve({ uri: { fsPath: 'report.md' } });
         }
-        const uri = options || arguments[0];
+        const uri = options;
         return Promise.resolve(mockDocuments[uri.fsPath as keyof typeof mockDocuments]);
       });
 

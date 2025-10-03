@@ -300,14 +300,36 @@ export enum LogLevel {
  */
 export class Logger {
   private static instance: Logger;
-  private outputChannel: vscode.OutputChannel;
+  private outputChannel: vscode.OutputChannel | { appendLine: (msg: string) => void; clear: () => void; show: () => void; dispose: () => void };
   private logLevel: LogLevel = LogLevel.INFO;
 
   /**
    * Private constructor to enforce singleton pattern
    */
   private constructor() {
-    this.outputChannel = vscode.window.createOutputChannel('Baseline Sidekick');
+    // Some tests mock vscode without window or createOutputChannel; fall back to console
+    let oc: vscode.OutputChannel | undefined;
+    try {
+      const win: any = (vscode as any).window;
+      if (win && typeof win.createOutputChannel === 'function') {
+        oc = win.createOutputChannel('Baseline Sidekick') as vscode.OutputChannel;
+      }
+    } catch {
+      // Accessing missing export on Vitest mocks can throw; ignore and use fallback
+      oc = undefined;
+    }
+
+    if (oc) {
+      this.outputChannel = oc;
+    } else {
+      const consoleChannel = {
+        appendLine: (msg: string) => console.log(msg),
+        clear: () => {},
+        show: () => {},
+        dispose: () => {},
+      };
+      this.outputChannel = consoleChannel;
+    }
   }
 
   /**
@@ -387,7 +409,7 @@ export class Logger {
     
     const logMessage = `[${timestamp}] ERROR [${errorInfo.category}:${errorInfo.severity}]${contextStr}: ${errorInfo.message}${stackTrace}`;
     
-    this.outputChannel.appendLine(logMessage);
+  this.outputChannel.appendLine(logMessage);
     console.error(logMessage);
   }
 
@@ -402,7 +424,7 @@ export class Logger {
     const contextStr = context ? ` ${JSON.stringify(context)}` : '';
     const logMessage = `[${timestamp}] ${level.toUpperCase()}: ${message}${contextStr}`;
     
-    this.outputChannel.appendLine(logMessage);
+  this.outputChannel.appendLine(logMessage);
     
     // Also log to console for development
     switch (level) {
@@ -438,14 +460,14 @@ export class Logger {
    * Show the output channel to the user
    */
   public show(): void {
-    this.outputChannel.show();
+  this.outputChannel.show();
   }
 
   /**
    * Clear the output channel
    */
   public clear(): void {
-    this.outputChannel.clear();
+  this.outputChannel.clear();
   }
 
   /**

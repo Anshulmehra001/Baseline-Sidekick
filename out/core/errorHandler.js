@@ -287,7 +287,30 @@ class Logger {
      */
     constructor() {
         this.logLevel = LogLevel.INFO;
-        this.outputChannel = vscode.window.createOutputChannel('Baseline Sidekick');
+        // Some tests mock vscode without window or createOutputChannel; fall back to console
+        let oc;
+        try {
+            const win = vscode.window;
+            if (win && typeof win.createOutputChannel === 'function') {
+                oc = win.createOutputChannel('Baseline Sidekick');
+            }
+        }
+        catch {
+            // Accessing missing export on Vitest mocks can throw; ignore and use fallback
+            oc = undefined;
+        }
+        if (oc) {
+            this.outputChannel = oc;
+        }
+        else {
+            const consoleChannel = {
+                appendLine: (msg) => console.log(msg),
+                clear: () => { },
+                show: () => { },
+                dispose: () => { },
+            };
+            this.outputChannel = consoleChannel;
+        }
     }
     /**
      * Get the singleton instance of Logger

@@ -14,23 +14,45 @@ export class DiagnosticCollection {
   delete() {}
 }
 
+export class OutputChannel {
+  appendLine() {}
+  append() {}
+  clear() {}
+  show() {}
+  hide() {}
+  dispose() {}
+}
+
 export const languages = {
   createDiagnosticCollection: () => new DiagnosticCollection(),
+  registerHoverProvider: () => ({ dispose: () => {} }),
+  registerCodeActionsProvider: () => ({ dispose: () => {} }),
 };
 
 export const window = {
-  showErrorMessage: () => {},
-  showWarningMessage: () => {},
-  showInformationMessage: () => {},
+  showErrorMessage: () => Promise.resolve(),
+  showWarningMessage: () => Promise.resolve(),
+  showInformationMessage: () => Promise.resolve(),
+  createOutputChannel: () => new OutputChannel(),
+  withProgress: (options: any, task: any) => task({ report: () => {} }),
+  showTextDocument: () => Promise.resolve(),
 };
 
 export const workspace = {
   findFiles: () => Promise.resolve([]),
   openTextDocument: () => Promise.resolve({}),
+  textDocuments: [],
+  onDidChangeTextDocument: () => ({ dispose: () => {} }),
+  onDidOpenTextDocument: () => ({ dispose: () => {} }),
+  onDidSaveTextDocument: () => ({ dispose: () => {} }),
+  getConfiguration: () => ({
+    get: (key: string, defaultValue: any) => defaultValue
+  }),
+  asRelativePath: (uri: any) => uri,
 };
 
 export const commands = {
-  registerCommand: () => {},
+  registerCommand: () => ({ dispose: () => {} }),
 };
 
 export const DiagnosticSeverity = {
@@ -40,7 +62,44 @@ export const DiagnosticSeverity = {
   Hint: 3,
 };
 
-export const Uri = {
-  file: (path: string) => ({ fsPath: path }),
-  parse: (uri: string) => ({ fsPath: uri }),
+export const CodeActionKind = {
+  RefactorRewrite: 'refactor.rewrite',
+  QuickFix: 'quickfix',
 };
+
+export const ProgressLocation = {
+  Notification: 15,
+  Window: 10,
+};
+
+export const Uri = {
+  file: (path: string) => ({ fsPath: path, toString: () => path }),
+  parse: (uri: string) => ({ fsPath: uri, toString: () => uri }),
+};
+
+export class Diagnostic {
+  constructor(
+    public range: Range,
+    public message: string,
+    public severity?: number
+  ) {}
+}
+
+export class CodeAction {
+  constructor(public title: string, public kind?: string) {}
+}
+
+export class WorkspaceEdit {
+  replace() {}
+}
+
+export class Hover {
+  constructor(public contents: any, public range?: Range) {}
+}
+
+export class MarkdownString {
+  constructor(public value?: string) {}
+  appendMarkdown(value: string) {
+    this.value = (this.value || '') + value;
+  }
+}

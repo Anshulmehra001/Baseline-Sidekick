@@ -252,6 +252,10 @@ class JsParser {
         if (apiMappings[apiPath]) {
             return apiMappings[apiPath];
         }
+        // Handle global function without prefix
+        if (apiPath === 'fetch') {
+            return 'api.fetch';
+        }
         // Handle method calls on variables (e.g., arr.at(), str.includes())
         // These need special handling since we can't know the variable type
         const parts = apiPath.split('.');

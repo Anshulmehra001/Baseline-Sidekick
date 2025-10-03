@@ -82,7 +82,11 @@ export class PerformanceOptimizer {
    */
   private loadConfiguration(): void {
     try {
-      const config = vscode.workspace.getConfiguration('baselineSidekick.performance');
+      const config = (vscode as any)?.workspace?.getConfiguration
+        ? vscode.workspace.getConfiguration('baselineSidekick.performance')
+        : {
+            get: (_key: string, def: any) => def,
+          } as any;
       
       this.config = {
         debounceDelay: config.get('debounceDelay', DEFAULT_PERFORMANCE_CONFIG.debounceDelay),

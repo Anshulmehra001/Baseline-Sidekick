@@ -68,7 +68,11 @@ class PerformanceOptimizer {
      */
     loadConfiguration() {
         try {
-            const config = vscode.workspace.getConfiguration('baselineSidekick.performance');
+            const config = vscode?.workspace?.getConfiguration
+                ? vscode.workspace.getConfiguration('baselineSidekick.performance')
+                : {
+                    get: (_key, def) => def,
+                };
             this.config = {
                 debounceDelay: config.get('debounceDelay', exports.DEFAULT_PERFORMANCE_CONFIG.debounceDelay),
                 maxFileSize: config.get('maxFileSize', exports.DEFAULT_PERFORMANCE_CONFIG.maxFileSize),

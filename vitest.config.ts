@@ -1,4 +1,7 @@
 import { defineConfig } from 'vitest/config';
+import { fileURLToPath } from 'url';
+
+const vscodeMockPath = fileURLToPath(new URL('./src/__mocks__/vscode.ts', import.meta.url));
 
 export default defineConfig({
   test: {
@@ -6,8 +9,10 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts'],
     exclude: ['out/**/*', 'node_modules/**/*'],
+  },
+  resolve: {
     alias: {
-      vscode: new URL('./src/__mocks__/vscode.ts', import.meta.url).pathname,
+      vscode: vscodeMockPath,
     },
   },
 });

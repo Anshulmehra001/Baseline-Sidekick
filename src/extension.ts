@@ -130,10 +130,10 @@ export async function activate(context: vscode.ExtensionContext) {
         errorHandler?.handleExtensionError(errorMessage, 'Extension activation');
         
         // Show user notification for critical activation failure
-        await vscode.window.showErrorMessage(
+        await (vscode.window.showErrorMessage(
             `Failed to activate Baseline Sidekick: ${errorMessage.message}`,
             'View Logs'
-        ).then(selection => {
+        ) as any)?.then?.((selection: any) => {
             if (selection === 'View Logs') {
                 logger?.show();
             }
