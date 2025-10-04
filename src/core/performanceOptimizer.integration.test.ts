@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PerformanceOptimizer } from './performanceOptimizer';
 import { DiagnosticController } from '../diagnostics';
+import * as vscode from 'vscode';
 
 // Mock VS Code
 vi.mock('vscode', () => ({
@@ -176,7 +177,7 @@ describe.skip('PerformanceOptimizer Integration Tests', () => {
       await new Promise(resolve => setTimeout(resolve, 400));
 
       // Both should be processed
-      expect(mockVscode.languages.createDiagnosticCollection).toHaveBeenCalled();
+      expect((vscode as any).languages.createDiagnosticCollection).toHaveBeenCalled();
     });
   });
 
@@ -196,7 +197,7 @@ describe.skip('PerformanceOptimizer Integration Tests', () => {
 
       // Should not process the file due to size limits
       // The diagnostic collection should still be created but no diagnostics set
-      expect(mockVscode.languages.createDiagnosticCollection).toHaveBeenCalled();
+      expect((vscode as any).languages.createDiagnosticCollection).toHaveBeenCalled();
     });
 
     it('should process normal-sized files', async () => {
@@ -212,7 +213,7 @@ describe.skip('PerformanceOptimizer Integration Tests', () => {
       // Wait for processing
       await new Promise(resolve => setTimeout(resolve, 400));
 
-      expect(mockVscode.languages.createDiagnosticCollection).toHaveBeenCalled();
+      expect((vscode as any).languages.createDiagnosticCollection).toHaveBeenCalled();
     });
   });
 
@@ -292,7 +293,7 @@ describe.skip('PerformanceOptimizer Integration Tests', () => {
       const { CssParser } = await import('./cssParser');
       
       // Mock parser to simulate slow operation
-      vi.spyOn(CssParser, 'parseCss').mockImplementation(() => {
+      vi.spyOn(CssParser, 'parseCss').mockImplementation((): any => {
         return new Promise(resolve => {
           setTimeout(() => resolve({
             features: [],
@@ -316,7 +317,7 @@ describe.skip('PerformanceOptimizer Integration Tests', () => {
       await new Promise(resolve => setTimeout(resolve, 500));
 
       // Should handle timeout gracefully without crashing
-      expect(mockVscode.languages.createDiagnosticCollection).toHaveBeenCalled();
+      expect((vscode as any).languages.createDiagnosticCollection).toHaveBeenCalled();
     });
   });
 
@@ -338,7 +339,7 @@ describe.skip('PerformanceOptimizer Integration Tests', () => {
       // Wait for async processing
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      expect(mockVscode.languages.createDiagnosticCollection).toHaveBeenCalled();
+      expect((vscode as any).languages.createDiagnosticCollection).toHaveBeenCalled();
     });
 
     it('should use synchronous processing for small files', async () => {
@@ -357,7 +358,7 @@ describe.skip('PerformanceOptimizer Integration Tests', () => {
       // Wait for processing
       await new Promise(resolve => setTimeout(resolve, 400));
 
-      expect(mockVscode.languages.createDiagnosticCollection).toHaveBeenCalled();
+      expect((vscode as any).languages.createDiagnosticCollection).toHaveBeenCalled();
     });
   });
 

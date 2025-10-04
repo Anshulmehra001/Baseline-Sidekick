@@ -29,11 +29,27 @@ export const languages = {
   registerCodeActionsProvider: () => ({ dispose: () => {} }),
 };
 
+export const StatusBarAlignment = {
+  Left: 1,
+  Right: 2
+};
+
+export class StatusBarItem {
+  text: string = '';
+  tooltip: string = '';
+  command: string = '';
+  backgroundColor: any;
+  show() {}
+  hide() {}
+  dispose() {}
+}
+
 export const window = {
   showErrorMessage: () => Promise.resolve(),
   showWarningMessage: () => Promise.resolve(),
   showInformationMessage: () => Promise.resolve(),
   createOutputChannel: () => new OutputChannel(),
+  createStatusBarItem: () => new StatusBarItem(),
   withProgress: (options: any, task: any) => task({ report: () => {} }),
   showTextDocument: () => Promise.resolve(),
 };

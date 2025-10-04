@@ -1,0 +1,18 @@
+Copyright Notice
+================
+
+Baseline Sidekick VS Code Extension
+Copyright © 2025 Anshulmehra001. All Rights Reserved.
+
+This software is proprietary and confidential. Unauthorized copying, 
+distribution, modification, public display, or public performance of 
+this software is strictly prohibited.
+
+This extension was developed exclusively for the Google Baseline Tooling 
+Hackathon 2025 and remains the intellectual property of the author.
+
+For licensing inquiries, contact: [Your Contact Information]
+
+Google Baseline Tooling Hackathon 2025 Entry
+Developed by: Anshulmehra001
+Repository: https://github.com/Anshulmehra001/Baseline-Sidekick

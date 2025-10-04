@@ -1,7 +1,7 @@
 "use strict";
 // Mock VS Code API for testing
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MarkdownString = exports.Hover = exports.WorkspaceEdit = exports.CodeAction = exports.Diagnostic = exports.Uri = exports.ProgressLocation = exports.CodeActionKind = exports.DiagnosticSeverity = exports.commands = exports.workspace = exports.window = exports.languages = exports.OutputChannel = exports.DiagnosticCollection = exports.Range = exports.Position = void 0;
+exports.MarkdownString = exports.Hover = exports.WorkspaceEdit = exports.CodeAction = exports.Diagnostic = exports.Uri = exports.ProgressLocation = exports.CodeActionKind = exports.DiagnosticSeverity = exports.commands = exports.workspace = exports.window = exports.StatusBarItem = exports.StatusBarAlignment = exports.languages = exports.OutputChannel = exports.DiagnosticCollection = exports.Range = exports.Position = void 0;
 class Position {
     constructor(line, character) {
         this.line = line;
@@ -36,11 +36,27 @@ exports.languages = {
     registerHoverProvider: () => ({ dispose: () => { } }),
     registerCodeActionsProvider: () => ({ dispose: () => { } }),
 };
+exports.StatusBarAlignment = {
+    Left: 1,
+    Right: 2
+};
+class StatusBarItem {
+    constructor() {
+        this.text = '';
+        this.tooltip = '';
+        this.command = '';
+    }
+    show() { }
+    hide() { }
+    dispose() { }
+}
+exports.StatusBarItem = StatusBarItem;
 exports.window = {
     showErrorMessage: () => Promise.resolve(),
     showWarningMessage: () => Promise.resolve(),
     showInformationMessage: () => Promise.resolve(),
     createOutputChannel: () => new OutputChannel(),
+    createStatusBarItem: () => new StatusBarItem(),
     withProgress: (options, task) => task({ report: () => { } }),
     showTextDocument: () => Promise.resolve(),
 };

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baseline Sidekick Demo - HTML Compatibility</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; margin: 2rem; }
+        .section { margin: 2rem 0; padding: 1rem; border: 1px solid #ddd; }
+        .baseline { background-color: #e8f5e8; }
+        .check-status { background-color: #fff3cd; }
+    </style>
+</head>
+<body>
+    <!-- ✅ BASELINE COMPATIBLE HTML ELEMENTS -->
+    <header class="section baseline">
+        <h1>Baseline HTML Elements</h1>
+        <nav>
+            <ul>
+                <li><a href="#section1">Basic Elements</a></li>
+                <li><a href="#section2">Forms</a></li>
+                <li><a href="#section3">Media</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="section1" class="section baseline">
+            <h2>Basic Semantic Elements (Baseline)</h2>
+            <article>
+                <header>
+                    <h3>Article Header</h3>
+                    <time datetime="2025-10-05">October 5, 2025</time>
+                </header>
+                <p>This paragraph contains <strong>strong text</strong> and <em>emphasized text</em>.</p>
+                <blockquote>
+                    <p>This is a baseline-compatible blockquote element.</p>
+                </blockquote>
+            </article>
+        </section>
+
+        <section id="section2" class="section baseline">
+            <h2>Form Elements (Baseline)</h2>
+            <form>
+                <fieldset>
+                    <legend>User Information</legend>
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                    
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email">
+                    
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" rows="4"></textarea>
+                </fieldset>
+                <button type="submit">Submit</button>
+            </form>
+        </section>
+
+        <!-- ❌ CHECK BASELINE STATUS - These may or may not be baseline -->
+        <section id="section3" class="section check-status">
+            <h2>Elements to Check for Baseline Compatibility</h2>
+            
+            <!-- Modern interactive elements -->
+            <details>
+                <summary>Expandable Section (check baseline status)</summary>
+                <p>This content is inside a details/summary element.</p>
+            </details>
+            
+            <!-- Dialog element -->
+            <dialog id="demo-dialog">
+                <p>This is a dialog element (check baseline status)</p>
+                <button onclick="this.parentElement.close()">Close</button>
+            </dialog>
+            <button onclick="document.getElementById('demo-dialog').showModal()">
+                Open Dialog (check baseline status)
+            </button>
+            
+            <!-- Modern input types -->
+            <form class="modern-inputs">
+                <h3>Modern Input Types</h3>
+                <label for="date-input">Date:</label>
+                <input type="date" id="date-input" name="date">
+                
+                <label for="time-input">Time:</label>
+                <input type="time" id="time-input" name="time">
+                
+                <label for="color-input">Color:</label>
+                <input type="color" id="color-input" name="color">
+                
+                <label for="range-input">Range:</label>
+                <input type="range" id="range-input" name="range" min="0" max="100">
+            </form>
+            
+            <!-- Media elements -->
+            <h3>Media Elements</h3>
+            <video controls width="300" height="200">
+                <source src="demo-video.mp4" type="video/mp4">
+                <track kind="subtitles" src="subtitles.vtt" srclang="en" label="English">
+                Your browser doesn't support video.
+            </video>
+            
+            <audio controls>
+                <source src="demo-audio.mp3" type="audio/mpeg">
+                Your browser doesn't support audio.
+            </audio>
+            
+            <!-- Canvas and SVG -->
+            <canvas id="demo-canvas" width="200" height="100" style="border: 1px solid #000;">
+                Canvas not supported
+            </canvas>
+            
+            <svg width="200" height="100" style="border: 1px solid #000;">
+                <rect x="10" y="10" width="180" height="80" fill="#007ACC"/>
+                <text x="100" y="55" text-anchor="middle" fill="white">SVG Element</text>
+            </svg>
+        </section>
+    </main>
+
+    <footer class="section baseline">
+        <p>&copy; 2025 Baseline Sidekick Demo. Check the VS Code Problems panel for compatibility analysis!</p>
+    </footer>
+
+    <script>
+        // Simple script to test JavaScript compatibility detection
+        console.log('Demo page loaded successfully!');
+        
+        // Test modern JavaScript features
+        const demoFeatures = () => {
+            // Check if these are baseline compatible
+            document.querySelector('details')?.addEventListener('toggle', (event) => {
+                console.log('Details toggled:', event.target.open);
+            });
+        };
+        
+        demoFeatures();
+    </script>
+</body>
+</html>

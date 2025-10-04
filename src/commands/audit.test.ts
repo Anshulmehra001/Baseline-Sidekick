@@ -115,7 +115,7 @@ describe('WorkspaceAuditor', () => {
       (vscode.workspace.findFiles as any).mockResolvedValue([]);
       
       // Mock withProgress to call the callback immediately
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -138,7 +138,7 @@ describe('WorkspaceAuditor', () => {
       mockToken.isCancellationRequested = true;
 
       // Mock withProgress to call the callback immediately
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -171,7 +171,7 @@ describe('WorkspaceAuditor', () => {
       });
 
       // Mock withProgress to call the callback immediately
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -222,7 +222,7 @@ describe('WorkspaceAuditor', () => {
       });
 
       // Mock withProgress to call the callback immediately
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -254,7 +254,7 @@ describe('WorkspaceAuditor', () => {
       ];
       
       (vscode.workspace.findFiles as any).mockResolvedValue(mockFiles);
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -292,7 +292,7 @@ describe('WorkspaceAuditor', () => {
         locations: new Map()
       });
 
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -330,7 +330,7 @@ describe('WorkspaceAuditor', () => {
         status: { baseline: false }
       });
 
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -365,7 +365,7 @@ describe('WorkspaceAuditor', () => {
         status: { baseline: 'low' }
       });
 
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -400,7 +400,7 @@ describe('WorkspaceAuditor', () => {
         status: { baseline: false }
       });
 
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -425,7 +425,7 @@ describe('WorkspaceAuditor', () => {
         throw new Error('Parse error');
       });
 
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -461,7 +461,7 @@ describe('WorkspaceAuditor', () => {
         return Promise.resolve(mockDocument);
       });
 
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -508,7 +508,7 @@ describe('WorkspaceAuditor', () => {
         return Promise.resolve(mockDocument);
       });
 
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 
@@ -539,7 +539,7 @@ describe('WorkspaceAuditor', () => {
         locations: new Map()
       });
 
-      (vscode.window.withProgress as any).mockImplementation(async (options, callback) => {
+      (vscode.window.withProgress as any).mockImplementation(async (options: any, callback: any) => {
         return await callback(mockProgress, mockToken);
       });
 

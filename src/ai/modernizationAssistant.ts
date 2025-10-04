@@ -16,12 +16,22 @@ export class AIModernizationAssistant {
   }
 
   constructor() {
-    this.apiKey = this.getApiKey();
+    try {
+      this.apiKey = this.getApiKey();
+    } catch (error) {
+      console.warn('Failed to load Gemini API key:', error);
+      this.apiKey = '';
+    }
   }
 
   private getApiKey(): string | undefined {
-    const config = vscode.workspace.getConfiguration('baselineSidekick');
-    return config.get<string>('ai.geminiApiKey') || process.env.GEMINI_API_KEY;
+    try {
+      const config = vscode.workspace.getConfiguration('baselineSidekick');
+      return config.get<string>('ai.geminiApiKey') || process.env.GEMINI_API_KEY;
+    } catch (error) {
+      // Gracefully handle test environment where vscode mock might be incomplete
+      return process.env.GEMINI_API_KEY || '';
+    }
   }
 
   /**
@@ -190,7 +200,7 @@ Format your response in clear sections with code examples.`;
       throw new Error(`API request failed: ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
     return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
   }
 

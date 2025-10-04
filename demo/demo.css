@@ -1,0 +1,43 @@
+/* Baseline Sidekick Demo - CSS Compatibility Testing */
+
+/* ✅ BASELINE COMPATIBLE FEATURES */
+.modern-layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.baseline-styles {
+  background-color: #007ACC;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ❌ NON-BASELINE FEATURES (should show red underlines) */
+.legacy-layout {
+  float: left;                    /* Non-baseline: use flexbox/grid instead */
+  clear: both;                   /* Non-baseline: related to float */
+}
+
+.vendor-prefixed {
+  -webkit-appearance: none;       /* Non-baseline: vendor prefix */
+  -moz-user-select: none;        /* Non-baseline: vendor prefix */
+  -webkit-transform: scale(1.1);  /* Non-baseline: use transform instead */
+}
+
+.modern-but-unsupported {
+  backdrop-filter: blur(10px);    /* Check baseline status */
+  container-type: inline-size;    /* Check baseline status */
+  aspect-ratio: 16 / 9;          /* Check baseline status */
+}

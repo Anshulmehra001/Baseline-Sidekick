@@ -1,15 +1,48 @@
 {
   "name": "baseline-sidekick",
   "displayName": "Baseline Sidekick",
-  "description": "VS Code extension that helps identify web platform features not part of the Baseline standard",
+  "description": "AI-powered baseline compatibility assistant for VS Code - Google Baseline Tooling Hackathon 2025",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.74.0"
   },
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#007ACC",
+    "theme": "dark"
+  },
   "categories": [
     "Linters",
-    "Other"
+    "Other",
+    "Machine Learning",
+    "Programming Languages"
   ],
+  "keywords": [
+    "baseline",
+    "web-platform",
+    "compatibility",
+    "cross-browser",
+    "ai",
+    "modernization",
+    "polyfill",
+    "css",
+    "javascript",
+    "html",
+    "hackathon",
+    "google"
+  ],
+  "author": "Anshulmehra001",
+  "publisher": "Anshulmehra001",
+  "license": "UNLICENSED",
+  "private": true,
+  "homepage": "https://github.com/Anshulmehra001/baseline-sidekick#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Anshulmehra001/Baseline-Sidekick.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Anshulmehra001/Baseline-Sidekick/issues"
+  },
   "activationEvents": [
     "onLanguage:css",
     "onLanguage:javascript",
@@ -20,9 +53,86 @@
   "contributes": {
     "commands": [
       {
+        "command": "baselineSidekick.showMainMenu",
+        "title": "🚀 Baseline Sidekick - Main Menu",
+        "category": "Baseline Sidekick",
+        "icon": "$(rocket)"
+      },
+      {
+        "command": "baselineSidekick.showTutorial",
+        "title": "🎓 Show Tutorial",
+        "category": "Baseline Sidekick",
+        "icon": "$(mortar-board)"
+      },
+      {
+        "command": "baselineSidekick.showCompatibilityReport",
+        "title": "📊 Compatibility Report",
+        "category": "Baseline Sidekick",
+        "icon": "$(graph)"
+      },
+      {
         "command": "baseline.auditWorkspace",
-        "title": "Audit Workspace for Baseline Compatibility",
+        "title": "🔍 Check Current File",
+        "category": "Baseline Sidekick"
+      },
+      {
+        "command": "baseline.ai.generatePolyfill",
+        "title": "🤖 Generate AI Polyfill",
+        "category": "Baseline AI"
+      },
+      {
+        "command": "baseline.ai.generateConfig",
+        "title": "🤖 Generate Build Configuration",
+        "category": "Baseline AI"
+      },
+      {
+        "command": "baseline.ai.refactorCode",
+        "title": "🤖 AI Code Refactoring",
+        "category": "Baseline AI"
+      },
+      {
+        "command": "baseline.ai.showAlternatives",
+        "title": "🤖 Show Baseline Alternatives",
+        "category": "Baseline AI"
+      },
+      {
+        "command": "baseline.ai.modernizeFile",
+        "title": "🤖 Modernize File with AI",
+        "category": "Baseline AI"
+      },
+      {
+        "command": "baseline.ai.generateStrategy",
+        "title": "🤖 Generate Modernization Strategy",
+        "category": "Baseline AI"
+      },
+      {
+        "command": "baseline.ai.analyzePerformance",
+        "title": "🤖 Analyze Performance Impact",
+        "category": "Baseline AI"
+      },
+      {
+        "command": "baseline.showScoreDetails",
+        "title": "📊 Show Baseline Score Dashboard",
         "category": "Baseline"
+      },
+      {
+        "command": "baseline.ai.modernizationWizard",
+        "title": "🧙‍♂️ Launch Modernization Wizard",
+        "category": "Baseline AI"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "baselineSidekick.showMainMenu",
+        "key": "ctrl+shift+b",
+        "mac": "cmd+shift+b",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "baseline.auditWorkspace",
+        "key": "ctrl+alt+b",
+        "mac": "cmd+alt+b",
+        "when": "editorTextFocus"
       }
     ],
     "configuration": {
@@ -72,6 +182,21 @@
           "default": 102400,
           "minimum": 1024,
           "description": "Threshold for considering a file 'large' in bytes (default: 100KB)"
+        },
+        "baselineSidekick.ai.geminiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Google Gemini API key for AI-powered features (get at https://aistudio.google.com/app/apikey)"
+        },
+        "baselineSidekick.ai.enableAIFeatures": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable AI-powered modernization features"
+        },
+        "baselineSidekick.gamification.enableScoring": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable baseline compatibility scoring and achievements"
         }
       }
     }

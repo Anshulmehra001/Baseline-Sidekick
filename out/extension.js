@@ -29,13 +29,23 @@ const baselineData_1 = require("./core/baselineData");
 const diagnostics_1 = require("./diagnostics");
 const hoverProvider_1 = require("./providers/hoverProvider");
 const codeActionProvider_1 = require("./providers/codeActionProvider");
+const enhancedCodeActionProvider_1 = require("./providers/enhancedCodeActionProvider");
 const audit_1 = require("./commands/audit");
+const aiCommandHandlers_1 = require("./commands/aiCommandHandlers");
+const scoreManager_1 = require("./gamification/scoreManager");
 const errorHandler_1 = require("./core/errorHandler");
+const welcomeExperience_1 = require("./ui/welcomeExperience");
+const enhancedStatusBar_1 = require("./ui/enhancedStatusBar");
+const quickAccessInterface_1 = require("./ui/quickAccessInterface");
 // Global references for cleanup
 let diagnosticController;
 let baselineDataManager;
+let scoreManager;
+let aiCommandHandlers;
 let errorHandler;
 let logger;
+let welcomeExperience;
+let enhancedStatusBar;
 /**
  * Extension activation function
  * Initializes all providers, commands, and event handlers
@@ -105,7 +115,17 @@ async function activate(context) {
         const hoverProvider = new hoverProvider_1.BaselineHoverProvider();
         const hoverProviderDisposable = vscode.languages.registerHoverProvider(supportedLanguages, hoverProvider);
         context.subscriptions.push(hoverProviderDisposable);
-        // Register code action provider with appropriate document selectors
+        // Register enhanced code action provider with AI capabilities
+        const enhancedCodeActionProvider = new enhancedCodeActionProvider_1.EnhancedCodeActionProvider();
+        const enhancedCodeActionDisposable = vscode.languages.registerCodeActionsProvider(supportedLanguages, enhancedCodeActionProvider, {
+            providedCodeActionKinds: [
+                vscode.CodeActionKind.RefactorRewrite,
+                vscode.CodeActionKind.QuickFix,
+                vscode.CodeActionKind.Refactor
+            ]
+        });
+        context.subscriptions.push(enhancedCodeActionDisposable);
+        // Also register traditional code action provider for fallback
         const codeActionProvider = new codeActionProvider_1.BaselineCodeActionProvider();
         const codeActionProviderDisposable = vscode.languages.registerCodeActionsProvider(supportedLanguages, codeActionProvider, {
             providedCodeActionKinds: [
@@ -114,8 +134,34 @@ async function activate(context) {
             ]
         });
         context.subscriptions.push(codeActionProviderDisposable);
+        // Initialize scoring system
+        scoreManager = scoreManager_1.BaselineScoreManager.getInstance();
+        logger.info('Baseline scoring system initialized');
+        // Initialize enhanced UI/UX components
+        welcomeExperience = welcomeExperience_1.WelcomeExperience.getInstance(context);
+        enhancedStatusBar = new enhancedStatusBar_1.EnhancedStatusBar();
+        // Show welcome experience for new users
+        await welcomeExperience.showWelcomeIfNeeded();
+        logger.info('Enhanced UI components initialized');
+        // Initialize and register AI command handlers
+        aiCommandHandlers = new aiCommandHandlers_1.AICommandHandlers();
+        aiCommandHandlers.registerCommands(context);
+        logger.info('AI command handlers registered');
         // Register workspace audit command with command palette
         (0, audit_1.registerAuditCommand)(context);
+        // Register quick access interface commands
+        context.subscriptions.push(vscode.commands.registerCommand('baselineSidekick.showMainMenu', () => {
+            quickAccessInterface_1.QuickAccessInterface.showMainMenu();
+        }), vscode.commands.registerCommand('baselineSidekick.showTutorial', () => {
+            welcomeExperience?.showWelcomeIfNeeded();
+        }), vscode.commands.registerCommand('baselineSidekick.showCompatibilityReport', () => {
+            // Show compatibility report in a webview
+            vscode.window.showInformationMessage('📊 Compatibility Report: Check the Problems panel for detailed issues.', 'Open Problems Panel').then(choice => {
+                if (choice === 'Open Problems Panel') {
+                    vscode.commands.executeCommand('workbench.panel.markers.view.focus');
+                }
+            });
+        }));
         logger.info('All Baseline Sidekick providers and commands registered successfully');
     }
     catch (error) {
@@ -144,6 +190,18 @@ function deactivate() {
         }
         // Clear references
         baselineDataManager = undefined;
+        // Cleanup scoring system
+        if (scoreManager) {
+            scoreManager.dispose();
+            scoreManager = undefined;
+        }
+        // Cleanup UI components
+        if (enhancedStatusBar) {
+            enhancedStatusBar.dispose();
+            enhancedStatusBar = undefined;
+        }
+        welcomeExperience = undefined;
+        aiCommandHandlers = undefined;
         // Dispose logger last
         if (logger) {
             logger.info('Baseline Sidekick extension deactivated');

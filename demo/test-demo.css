@@ -1,0 +1,11 @@
+/* Test CSS file for Baseline Sidekick */
+.container {
+  /* ❌ Non-baseline features - should show red underlines */
+  float: left;
+  -webkit-appearance: none;
+  
+  /* ✅ Baseline features - should be fine */
+  display: grid;
+  gap: 1rem;
+  padding: 20px;
+}
