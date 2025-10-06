@@ -31,6 +31,7 @@ const jsParser_1 = require("./core/jsParser");
 const htmlParser_1 = require("./core/htmlParser");
 const errorHandler_1 = require("./core/errorHandler");
 const performanceOptimizer_1 = require("./core/performanceOptimizer");
+const scoreManager_1 = require("./gamification/scoreManager");
 /**
  * Diagnostic controller for managing Baseline compatibility diagnostics across multiple languages
  * Provides real-time analysis of CSS, JavaScript, and HTML files for non-Baseline features
@@ -47,6 +48,7 @@ class DiagnosticController {
         this.errorHandler = errorHandler_1.ErrorHandler.getInstance();
         this.logger = errorHandler_1.Logger.getInstance();
         this.performanceOptimizer = performanceOptimizer_1.PerformanceOptimizer.getInstance();
+        this.scoreManager = scoreManager_1.BaselineScoreManager.getInstance();
         // Create debounced version of updateDiagnostics
         this.debouncedUpdateDiagnostics = this.performanceOptimizer.debounce('diagnostics', (document) => this.updateDiagnosticsInternal(document));
         // Register for disposal when extension deactivates
@@ -98,6 +100,8 @@ class DiagnosticController {
                     this.diagnosticCollection.set(document.uri, diagnostics);
                     this.logger.debug(`Found ${diagnostics.length} compatibility issues in ${document.uri.fsPath}`);
                 }
+                // Calculate and update score based on diagnostics
+                await this.updateDocumentScore(document, diagnostics);
             }
             finally {
                 // Release memory tracking
@@ -400,6 +404,112 @@ class DiagnosticController {
             hash = hash & hash; // Convert to 32-bit integer
         }
         return hash.toString(36);
+    }
+    /**
+     * Updates the document score based on current diagnostics
+     * @param document VS Code document
+     * @param diagnostics Array of diagnostics for the document
+     */
+    async updateDocumentScore(document, diagnostics) {
+        try {
+            // Analyze the document content to get all features (baseline and non-baseline)
+            const allFeatures = await this.getAllDocumentFeatures(document);
+            const nonBaselineFeatureIds = new Set(diagnostics.map(d => d.code.value));
+            // Separate baseline and non-baseline features
+            const baselineFeatures = [];
+            const nonBaselineFeatures = [];
+            for (const featureId of allFeatures) {
+                const featureData = this.baselineDataManager.getFeatureData(featureId);
+                if (nonBaselineFeatureIds.has(featureId)) {
+                    nonBaselineFeatures.push({
+                        name: featureData?.name || featureId,
+                        type: this.getFeatureType(document.languageId),
+                        severity: this.getFeatureSeverity(featureId),
+                        reason: `Not baseline compatible: ${featureData?.name || featureId}`,
+                        alternatives: []
+                    });
+                }
+                else {
+                    baselineFeatures.push({
+                        name: featureData?.name || featureId,
+                        type: this.getFeatureType(document.languageId),
+                        confidence: 1.0
+                    });
+                }
+            }
+            const features = {
+                baseline: baselineFeatures,
+                nonBaseline: nonBaselineFeatures
+            };
+            // Calculate score for this file
+            const fileScore = this.scoreManager.calculateFileScore(document.uri, features);
+            // Get all workspace file scores and recalculate workspace score
+            const workspaceScores = [fileScore]; // In a full implementation, you'd collect all file scores
+            await this.scoreManager.calculateWorkspaceScore(workspaceScores);
+        }
+        catch (error) {
+            this.errorHandler.handleExtensionError(error instanceof Error ? error : new Error('Unknown error updating document score'), `Updating score for ${document.uri.fsPath}`);
+        }
+    }
+    /**
+     * Gets all features used in a document (both baseline and non-baseline)
+     */
+    async getAllDocumentFeatures(document) {
+        const content = document.getText();
+        const features = [];
+        try {
+            switch (document.languageId) {
+                case 'css':
+                case 'scss':
+                case 'sass':
+                case 'less':
+                    const cssResult = cssParser_1.CssParser.parseCss(content, document);
+                    features.push(...cssResult.features);
+                    break;
+                case 'javascript':
+                case 'typescript':
+                case 'javascriptreact':
+                case 'typescriptreact':
+                    const jsResult = jsParser_1.JsParser.parseJavaScript(content, document);
+                    features.push(...jsResult.features);
+                    break;
+                case 'html':
+                case 'xml':
+                    const htmlResult = htmlParser_1.HtmlParser.parseHtml(content, document);
+                    features.push(...htmlResult.features);
+                    break;
+            }
+        }
+        catch (error) {
+            this.logger.warn(`Error getting all features for ${document.uri.fsPath}: ${error}`);
+        }
+        return features;
+    }
+    /**
+     * Maps VS Code language ID to feature type
+     */
+    getFeatureType(languageId) {
+        if (['css', 'scss', 'sass', 'less'].includes(languageId)) {
+            return 'css';
+        }
+        if (['javascript', 'typescript', 'javascriptreact', 'typescriptreact'].includes(languageId)) {
+            return 'javascript';
+        }
+        return 'html';
+    }
+    /**
+     * Determines feature severity based on baseline data
+     */
+    getFeatureSeverity(featureId) {
+        const featureData = this.baselineDataManager.getFeatureData(featureId);
+        // Simple heuristic - can be improved with more detailed baseline data
+        if (featureId.includes('webkit') || featureId.includes('moz') || featureId.includes('ms')) {
+            return 'high'; // Vendor prefixes are high severity
+        }
+        if (featureData && !featureData.status.baseline) {
+            return 'high';
+        }
+        return 'medium';
     }
     /**
      * Disposes of the diagnostic controller and cleans up resources

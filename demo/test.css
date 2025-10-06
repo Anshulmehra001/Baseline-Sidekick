@@ -1,0 +1,45 @@
+/* Demo CSS for Screen Recording */
+/* Start with baseline-compatible code */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+}
+
+.card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 1rem 0;
+}
+
+/* Area for demo typing - Clip 2 & 3 */
+
+/* Area for legacy layout demo - Clip 5 */
+.legacy-layout {
+  width: 100%;
+  height: 400px;
+}
+
+.sidebar {
+  float: left;
+  width: 25%;
+  padding: 20px;
+  background: #f0f0f0;
+}
+
+.content {
+  float: right;
+  width: 70%;
+  padding: 20px;
+}
+
+.clearfix {
+  clear: both;
+}
+

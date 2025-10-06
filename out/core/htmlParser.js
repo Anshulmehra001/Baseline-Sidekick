@@ -105,6 +105,23 @@ class HtmlParser {
                                 }
                             }
                         }
+                        // Special handling for input type values
+                        if (element.tagName === 'input' && attr.name === 'type') {
+                            const inputTypeFeatureId = this.mapInputTypeToFeatureId(attr.value);
+                            if (inputTypeFeatureId && !features.includes(inputTypeFeatureId)) {
+                                features.push(inputTypeFeatureId);
+                                // Track input type location
+                                if (document && element.sourceCodeLocation?.attrs?.[attr.name]) {
+                                    const range = this.getAttributeRange(element, attr.name, document);
+                                    if (range) {
+                                        if (!locations.has(inputTypeFeatureId)) {
+                                            locations.set(inputTypeFeatureId, []);
+                                        }
+                                        locations.get(inputTypeFeatureId).push(range);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -144,16 +161,33 @@ class HtmlParser {
         }
         // Normalize tag name to lowercase
         const normalizedTag = tagName.toLowerCase();
-        // Map HTML elements to web-features IDs (comprehensive allowlist for testing)
-        const known = new Set([
-            'div', 'span', 'p', 'a', 'dialog', 'details', 'template', 'img', 'input', 'script', 'link', 'meta', 'iframe',
-            'html', 'head', 'body', 'title', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'nav', 'main', 'section',
-            'article', 'aside', 'footer', 'form', 'button', 'select', 'textarea', 'label', 'fieldset', 'legend', 'option', 'summary',
-            'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td', 'caption', 'ol', 'ul', 'li', 'dl', 'dt', 'dd', 'colgroup', 'col',
-            'video', 'audio', 'source', 'track', 'canvas', 'svg', 'object', 'figure', 'figcaption', 'time', 'mark', 'progress', 'meter', 'datalist',
-            'noscript', 'style', 'base', 'custom-header', 'custom-card', 'custom-button', 'my-component', 'slot'
+        // Only flag HTML elements that are actually non-baseline or newer
+        // Most HTML elements are universally supported and baseline
+        const nonBaselineElements = new Set([
+            'dialog',
+            'details',
+            'summary',
+            'template',
+            'slot',
+            'picture',
+            'source',
+            'track',
+            'progress',
+            'meter',
+            'datalist',
+            'output',
+            'time',
+            'mark' // Text highlighting - may not be baseline
         ]);
-        return known.has(normalizedTag) ? `html.elements.${normalizedTag}` : null;
+        // Only return feature IDs for elements that need baseline checking
+        if (nonBaselineElements.has(normalizedTag)) {
+            return `html.elements.${normalizedTag}`;
+        }
+        // Also check for custom elements (contain hyphens)
+        if (normalizedTag.includes('-')) {
+            return `html.elements.custom`; // Custom elements may not be baseline
+        }
+        return null; // Skip checking universal HTML elements like div, p, span, etc.
     }
     /**
      * Maps HTML attributes to web-features IDs
@@ -190,7 +224,8 @@ class HtmlParser {
                 'required': 'html.elements.input.required',
                 'min': 'html.elements.input.min',
                 'max': 'html.elements.input.max',
-                'step': 'html.elements.input.step'
+                'step': 'html.elements.input.step',
+                'type': 'html.elements.input.type' // Need to check input type values
             },
             'form': {
                 'novalidate': 'html.elements.form.novalidate'
@@ -254,6 +289,12 @@ class HtmlParser {
         if (elementSpecificAttributes[normalizedTag]?.[normalizedAttr]) {
             return elementSpecificAttributes[normalizedTag][normalizedAttr];
         }
+        // Special handling for input type attribute values
+        if (normalizedTag === 'input' && normalizedAttr === 'type') {
+            // We need to check the actual type value, but that requires accessing the attribute value
+            // This will be handled in a separate method when we have access to the attribute value
+            return null; // Don't flag the type attribute itself, flag specific type values
+        }
         // Notable global attributes that should be flagged
         const notableGlobalAttributes = {
             'contenteditable': 'html.global_attributes.contenteditable',
@@ -287,6 +328,38 @@ class HtmlParser {
         }
         // For other attributes, create a generic mapping
         return `html.attributes.${normalizedAttr}`;
+    }
+    /**
+     * Maps input type values to web-features IDs
+     * @param typeValue Input type attribute value
+     * @returns web-features ID or null if not mappable
+     */
+    static mapInputTypeToFeatureId(typeValue) {
+        if (!typeValue) {
+            return null;
+        }
+        // Normalize type value to lowercase
+        const normalizedType = typeValue.toLowerCase();
+        // Only flag newer/potentially non-baseline input types
+        // Basic types like text, password, submit, button are universally supported
+        const nonBaselineInputTypes = new Set([
+            'color',
+            'date',
+            'datetime-local',
+            'email',
+            'month',
+            'number',
+            'range',
+            'search',
+            'tel',
+            'time',
+            'url',
+            'week' // Week picker - may not be baseline
+        ]);
+        if (nonBaselineInputTypes.has(normalizedType)) {
+            return `html.elements.input.type.${normalizedType}`;
+        }
+        return null; // Skip baseline input types like text, password, submit, etc.
     }
     /**
      * Gets the VS Code range for an HTML element

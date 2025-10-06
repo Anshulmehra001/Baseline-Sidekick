@@ -1,206 +1,425 @@
-# 📖 Baseline Sidekick - Complete Usage Guide# Quick Start Guide
+# 🎯 Baseline Sidekick - Complete Usage Guide
 
+**AI-Powered Baseline Compatibility Assistant for VS Code**
 
-
-## 🚀 **Quick Start (2 Minutes)**## 🚀 Testing Your Extension
-
-
-
-### **Step 1: Launch Extension**### Launch Extension
-
-```bash1. **Press F5** in VS Code
-
-# In your Baseline-Sidekick folder2. Select **"VS Code Extension Development"** if prompted
-
-npm install && npm run compile3. New window opens: **"[Extension Development Host]"**
-
-# Press F5 in VS Code - Extension Development Host opens
-
-```### Create Test File
-
-In the Extension Host window:
-
-### **Step 2: Test Real-Time Analysis**1. **File → New File**
-
-1. Open `demo/demo.css` in the Extension Host window2. **Save as**: `test.css`
-
-2. Watch **red underlines** appear on non-baseline features3. **Paste this code**:
-
-3. **Hover** over `float: left` to see compatibility tooltip```css
-
-4. Check **status bar** (bottom-right) for live compatibility score.container {
-
-  float: left;      /* Should be underlined in red */
-
-### **Step 3: Try the Main Menu**  display: grid;    /* Should be clean */
-
-- Press **`Ctrl+Shift+B`** (Windows) or **`Cmd+Shift+B`** (Mac)}
-
-- Explore the GitHub Copilot-style interface:```
-
-  - 🔍 Check Current File
-
-  - 🤖 AI Assistant  ### Verify It Works
-
-  - 📊 Compatibility Report- ✅ `float: left` has red underline
-
-  - 🛠️ Fix All Issues- ✅ `display: grid` is clean  
-
-- ✅ Hover over red text shows compatibility tooltip
+*Baseline Tooling Hackathon 2025 - Team: Anshul Mehra & Apoorv Bhargava*
 
 ---
 
-### Test Commands
+## 🚀 Quick Start (2 Minutes)
 
-## 🎯 **Core Features**1. **Ctrl+Shift+P**
+### Step 1: Installation & Launch
+```bash
+# Clone the repository
+git clone https://github.com/Anshulmehra001/Baseline-Sidekick.git
+cd Baseline-Sidekick
 
-2. Type **"Baseline"**  
+# Install dependencies
+npm install
+npm run compile
 
-### **🔍 Real-Time Baseline Analysis**3. Try **"Baseline: Audit Workspace"**
+# Launch extension
+# Press F5 in VS Code → Extension Development Host opens
+```
 
-- **Instant Detection**: Red underlines on non-baseline features as you type
-
-- **Multi-Language**: CSS, JavaScript, TypeScript, HTML support## 🤖 AI Features (Optional)
-
-- **Performance Optimized**: Sub-second analysis with intelligent caching
-
-- **Visual Feedback**: Problems panel integration with detailed issues### Setup
-
-1. Get API key: https://aistudio.google.com/app/apikey
-
-### **💡 Intelligent Hover Tooltips**2. **Ctrl+,** → Search "Baseline Sidekick" 
-
-Hover over any compatibility issue to see:3. Enter key in settings
-
-- **Baseline Status**: ✅ Baseline or ❌ Non-baseline
-
-- **Browser Support**: Detailed compatibility information  ### Test AI
-
-- **Alternatives**: Suggested baseline-compatible replacements- Right-click on red underlined code
-
-- **Documentation Links**: Learn more about features- Look for AI options in context menu
-
-- Try **"Baseline AI: Generate Polyfill"**
-
-### **⚡ Quick Fixes & Code Actions**
-
-- **Right-click** on issues or press **`Ctrl+.`**## ✅ Success Checklist
-
-- **Smart Suggestions**: Context-aware baseline alternatives
-
-- **One-Click Fixes**: Instant replacements where possible- [ ] Extension Host window opens
-
-- **Batch Operations**: Fix multiple issues at once- [ ] Red underlines appear on non-baseline features
-
-- [ ] Hover tooltips show compatibility info
-
----- [ ] Commands work from Command Palette
-
-- [ ] No errors in Developer Console
-
-## 🤖 **AI-Powered Features**
-
-**Extension working? You're ready to demo!** 🎯
-### **🎯 Setup AI Assistant**
-1. **Get API Key**: Visit https://aistudio.google.com/app/apikey
-2. **Add to Settings**: 
-   - Go to **File → Preferences → Settings**
-   - Search "baseline sidekick"
-   - Enter key in **"Gemini Api Key"** field
-3. **Start Using**: AI features now available in main menu
-
-### **💡 Polyfill Generation**
+### Step 2: Create Test File
+1. **In Extension Host**, create new file: `test.css`
+2. **Type this code:**
 ```css
-/* Example: Non-baseline CSS */
 .container {
-  backdrop-filter: blur(10px);  /* AI generates polyfill */
+    display: flex;        /* ✅ Baseline compatible */
+    float: left;         /* ❌ Non-baseline - red squiggly appears */
 }
 ```
-- **AI creates**: Custom JavaScript polyfill
-- **Includes**: Fallback strategies and documentation
-- **Optimized**: Minimal, performance-focused code
+3. **Observe:** Red underline appears under `float: left`
+4. **Hover:** Rich tooltip shows compatibility details
+5. **Check Status Bar:** Shows baseline score percentage
 
-### **🔄 Code Modernization**
-```javascript
-// Before: Legacy code
-function oldFunction() {
-  var elements = document.getElementsByClassName('item');
-  for (var i = 0; i < elements.length; i++) {
-    elements[i].style.display = 'block';
-  }
-}
-
-// After: AI suggests baseline modern equivalent
-function modernFunction() {
-  const elements = document.querySelectorAll('.item');
-  elements.forEach(el => el.style.display = 'block');
-}
-```
+**🎉 You're ready! The extension is working.**
 
 ---
 
-## 🎮 **User Interface Guide**
+## 🔍 Core Features
 
-### **🚀 Main Menu (`Ctrl+Shift+B`)**
-```
-🚀 Baseline Sidekick - Main Menu
-├── 🔍 Check Current File      # Instant analysis
-├── 🤖 AI Assistant           # Smart suggestions
-├── 📊 Compatibility Report   # Detailed insights
-├── 🛠️ Fix All Issues        # Bulk operations
-├── 🎓 Tutorial              # Learn features
-└── ⚙️ Settings              # Customize experience
-```
+### 1. Real-Time Baseline Analysis
 
-### **📊 Enhanced Status Bar**
-Located in bottom-right corner:
-- **🟢 "✓ 95% Baseline"** - Excellent compatibility
-- **🟡 "⚠ 75% Baseline"** - Needs attention  
-- **🔴 "✗ 45% Baseline"** - Requires fixes
-- **Click** for detailed compatibility report
+**Instant Detection:**
+- Red squiggly lines appear on non-baseline features as you type
+- Supports CSS, JavaScript, TypeScript, HTML, SCSS, Sass, Less
+- Zero configuration required
 
----
-
-## 🎯 **Demo Files Walkthrough**
-
-### **📁 `demo/demo.css`**
+**Example - CSS:**
 ```css
-/* ✅ Baseline Compatible */
 .modern-layout {
-  display: grid;           /* Perfect baseline support */
-  gap: 1rem;              /* Widely supported */
-}
-
-/* ❌ Non-Baseline (Red Underlines) */
-.legacy-layout {
-  float: left;            /* Hover: Use flexbox/grid */
-  -webkit-appearance: none; /* Hover: Use appearance */
+    display: grid;              /* ✅ Baseline - no warning */
+    gap: 1rem;                 /* ✅ Baseline - no warning */
+    container-type: size;      /* ❌ Non-baseline - red squiggly */
+    -webkit-appearance: none;  /* ❌ Non-baseline - red squiggly */
 }
 ```
 
-### **📁 `demo/demo.js`** & **📁 `demo/demo.html`**
-Interactive examples showing baseline vs non-baseline features across all supported languages.
+**Example - JavaScript:**
+```javascript
+const items = ['a', 'b', 'c'];
+const first = items[0];        // ✅ Baseline - no warning
+const last = items.at(-1);     // ❌ Non-baseline - red squiggly
+```
+
+### 2. Rich Hover Tooltips
+
+**Hover over any red-underlined feature to see:**
+- Detailed compatibility explanation
+- Browser support information  
+- Baseline status and timeline
+- Alternative suggestions
+- Links to MDN documentation
+
+### 3. Problems Panel Integration
+
+**View detailed reports:**
+1. **View → Problems** (Ctrl+Shift+M)
+2. **Filter by:** "Baseline Sidekick"
+3. **See all issues** across your workspace
+4. **Click any issue** to jump to code location
 
 ---
 
-## 🏆 **Best Practices for Hackathon Judges**
+## 🤖 AI-Powered Features
 
-### **🎯 Quick Evaluation (5 Minutes)**
-1. **Press `F5`** - Extension loads in development host
-2. **Open `demo/demo.css`** - See instant red underlines
-3. **Press `Ctrl+Shift+B`** - Experience Copilot-style menu
-4. **Hover over red underlines** - See rich tooltips
-5. **Check status bar** - Live compatibility scoring
+### 1. Intelligent Polyfill Generation
 
-### **🎮 Full Feature Demo (15 Minutes)**
-1. **Real-time Analysis**: Edit demo files, watch live updates
-2. **Multi-Language**: Test CSS, JavaScript, HTML files
-3. **Command Palette**: `Ctrl+Shift+P` → Type "Baseline"
-4. **AI Features**: Add API key, try modernization wizard
-5. **Professional UX**: Note GitHub Copilot-level polish
+**For JavaScript features like `Array.at()`:**
+
+1. **Type non-baseline JavaScript:**
+```javascript
+const last = myArray.at(-1);  // Red squiggly appears
+```
+
+2. **Trigger AI Assistant:**
+   - Click on the red-underlined code
+   - Press `Ctrl+.` (or `Cmd+.` on Mac)
+   - Or right-click → Quick Fix
+
+3. **Select AI Option:**
+   - Choose: "✨ Baseline AI: Generate intelligent polyfill"
+
+4. **Generated Result:**
+```javascript
+// AI-generated polyfill
+if (!Array.prototype.at) {
+    Array.prototype.at = function(index) {
+        if (index < 0) index = this.length + index;
+        return this[index];
+    };
+}
+
+const last = myArray.at(-1);  // Now baseline-compatible!
+```
+
+### 2. CSS Modernization
+
+**Convert legacy layouts to modern baseline CSS:**
+
+1. **Select legacy CSS block:**
+```css
+.legacy-layout {
+    float: left;
+    width: 25%;
+    clear: both;
+}
+```
+
+2. **Trigger modernization:**
+   - Select the entire CSS block
+   - Press `Ctrl+.`
+   - Choose: "✨ Baseline AI: Modernize CSS to Flexbox/Grid"
+
+3. **AI transforms to:**
+```css
+.modern-layout {
+    display: flex;
+    flex: 0 0 25%;
+}
+```
+
+### 3. Build Configuration Generation
+
+**Create optimized build setups:**
+
+1. **Command Palette:** `Ctrl+Shift+P`
+2. **Type:** "Baseline AI: Generate Build Configuration"
+3. **AI creates:**
+   - `webpack.config.js` with baseline-compatible settings
+   - `.browserslistrc` with baseline browser targets
+   - `babel.config.js` with appropriate polyfills
 
 ---
 
-## 🎉 **Ready to Experience Baseline Excellence!**
+## 📊 Gamification System
 
-**Your Baseline Sidekick is now fully organized and ready for hackathon submission. Press `F5` to start your journey toward baseline web compatibility mastery!**
+### Real-Time Scoring
+
+**Status Bar Display:**
+- **A+ (95-100%):** 🏆 Baseline: 98% (A+)
+- **A (90-94%):** ⭐ Baseline: 92% (A)  
+- **B (80-89%):** 🎯 Baseline: 85% (B)
+- **C (70-79%):** ⚠️ Baseline: 75% (C)
+- **D-F (<70%):** ❌ Baseline: 60% (D)
+
+**How Scoring Works:**
+```
+Score = (Baseline Features / Total Features) × 100
+```
+
+**Example Calculation:**
+- 8 baseline features (flex, grid, etc.)
+- 2 non-baseline features (float, -webkit-*)
+- Score: (8/10) × 100 = 80% (B)
+
+### Achievement System
+
+**Click status bar for detailed breakdown:**
+- Total features analyzed
+- Baseline vs non-baseline count
+- Critical issues that need attention
+- Improvement suggestions
+- Historical progress tracking
+
+---
+
+## ⚙️ Configuration
+
+### Extension Settings
+
+**Access via:** File → Preferences → Settings → Search "Baseline Sidekick"
+
+**Key Settings:**
+```json
+{
+    "baselineSidekick.performance.debounceDelay": 300,
+    "baselineSidekick.performance.maxFileSize": 5242880,
+    "baselineSidekick.ai.geminiApiKey": "your-api-key-here"
+}
+```
+
+**Performance Tuning:**
+- `debounceDelay`: Analysis delay in milliseconds (default: 300ms)
+- `maxFileSize`: Maximum file size to analyze (default: 5MB)
+- `maxCacheSize`: Memory cache limit (default: 10,000 items)
+
+**AI Configuration:**
+- Set your Google Gemini API key for enhanced AI features
+- AI works offline with fallback suggestions if no key provided
+
+### Workspace Configuration
+
+**Create `.baseline-config.json` in project root:**
+```json
+{
+    "baseline": {
+        "strict": true,
+        "target": "2024",
+        "exclude": ["*.min.css", "vendor/**"],
+        "customRules": {
+            "css.float": "error",
+            "js.array.at": "warning"
+        }
+    }
+}
+```
+
+---
+
+## 💡 Advanced Usage
+
+### Command Palette Commands
+
+**Access all features via `Ctrl+Shift+P`:**
+
+1. **Baseline Sidekick: Show Main Menu** - Quick access hub
+2. **Baseline Sidekick: Compatibility Report** - Detailed analysis
+3. **Baseline: Audit Workspace** - Full project scan
+4. **Baseline AI: Generate Polyfill** - AI polyfill creation
+5. **Baseline AI: Modernize File** - AI-powered refactoring
+6. **Baseline AI: Show Alternatives** - Baseline alternatives
+
+### Keyboard Shortcuts
+
+**Default Shortcuts:**
+- `Ctrl+Shift+B`: Show Main Menu
+- `Ctrl+Alt+B`: Audit Current File
+- `Ctrl+.`: Quick Fix (context-aware)
+- `F1 → Baseline`: All commands
+
+### Integration with Other Tools
+
+**ESLint Integration:**
+```javascript
+// Works alongside ESLint
+module.exports = {
+    extends: ['baseline-sidekick/recommended'],
+    rules: {
+        'baseline/no-non-baseline-features': 'error'
+    }
+};
+```
+
+**Webpack Integration:**
+```javascript
+// Future: Webpack plugin
+const BaselinePlugin = require('baseline-sidekick/webpack');
+module.exports = {
+    plugins: [new BaselinePlugin({ strict: true })]
+};
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**❌ Extension not working:**
+1. Check VS Code version (1.74.0+ required)
+2. Reload window: `Ctrl+Shift+P` → "Developer: Reload Window"
+3. Check Extension Host console for errors
+
+**❌ No red squiggly lines:**
+1. Ensure file type is supported (CSS/JS/HTML)
+2. Save the file (`Ctrl+S`) to trigger analysis
+3. Check if file size exceeds limits (5MB default)
+
+**❌ AI features not working:**
+1. Verify Gemini API key in settings
+2. Check internet connection for AI features
+3. Fallback suggestions work offline
+
+**❌ Status bar not updating:**
+1. Click elsewhere and back to trigger update
+2. Check if extension is active in status bar
+3. Restart extension: `F1` → "Developer: Reload Window"
+
+### Performance Issues
+
+**For large files:**
+```json
+{
+    "baselineSidekick.performance.debounceDelay": 500,
+    "baselineSidekick.performance.enableAsyncProcessing": true,
+    "baselineSidekick.performance.largeFileThreshold": 10000
+}
+```
+
+**Memory optimization:**
+- Clear cache: `F1` → "Baseline: Clear Cache"
+- Reduce max cache size in settings
+- Exclude large files from analysis
+
+### Debug Mode
+
+**Enable debug logging:**
+```json
+{
+    "baselineSidekick.debug": true,
+    "baselineSidekick.logLevel": "debug"
+}
+```
+
+**View logs:** Output panel → "Baseline Sidekick"
+
+---
+
+## 📚 Examples & Tutorials
+
+### Tutorial 1: CSS Analysis Workflow
+
+1. **Create new file:** `styles.css`
+2. **Start with baseline code:**
+```css
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+```
+3. **Add problematic code:**
+```css
+.sidebar {
+    float: left;              /* Red squiggly appears */
+    -webkit-transform: scale(1.1);  /* Red squiggly appears */
+}
+```
+4. **Hover for details:** See compatibility explanations
+5. **Use AI fix:** `Ctrl+.` → Choose modernization option
+6. **Watch score change:** Status bar updates dynamically
+
+### Tutorial 2: JavaScript Polyfill Generation
+
+1. **Create:** `app.js`
+2. **Type modern JS:**
+```javascript
+const users = [
+    { name: 'Alice', age: 30 },
+    { name: 'Bob', age: 25 }
+];
+
+// Modern features that need polyfills
+const lastUser = users.at(-1);        // Array.at()
+const userName = users.at(0)?.name;   // Optional chaining
+const displayName = userName ?? 'Anonymous';  // Nullish coalescing
+```
+3. **See red squiggles** on non-baseline features
+4. **Generate polyfills:** Use AI assistant for each feature
+5. **Get production-ready code** with baseline compatibility
+
+---
+
+## 🎯 Best Practices
+
+### Development Workflow
+
+1. **Baseline-First Development:**
+   - Check status bar score regularly
+   - Aim for 90%+ baseline compatibility
+   - Use AI suggestions for modernization
+
+2. **Team Collaboration:**
+   - Share `.baseline-config.json` in repository
+   - Set project-wide baseline targets
+   - Use compatibility reports in code reviews
+
+3. **CI/CD Integration:**
+   - Add baseline checking to build pipeline
+   - Fail builds on critical compatibility issues
+   - Track baseline adoption metrics
+
+### Performance Tips
+
+1. **Large Projects:**
+   - Exclude `node_modules` from analysis
+   - Use file size limits appropriately
+   - Enable async processing for big files
+
+2. **Memory Management:**
+   - Clear cache periodically
+   - Monitor extension memory usage
+   - Adjust cache size based on project needs
+
+---
+
+## 🤝 Team & Support
+
+**Developers:**
+- **Anshul Mehra** - [@Anshulmehra001](https://github.com/Anshulmehra001)
+- **Apoorv Bhargava** - UI/UX & Documentation
+
+**Support:**
+- **Issues:** [GitHub Issues](https://github.com/Anshulmehra001/Baseline-Sidekick/issues)
+- **Documentation:** [Project Wiki](https://github.com/Anshulmehra001/Baseline-Sidekick/wiki)
+- **Hackathon:** Baseline Tooling Hackathon 2025
+
+---
+
+**🚀 Ready to accelerate baseline web development? Start coding with confidence!**
+
+*Built with ❤️ for the Baseline Tooling Hackathon 2025*

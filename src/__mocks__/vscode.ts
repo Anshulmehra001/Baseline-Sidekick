@@ -1,4 +1,5 @@
 // Mock VS Code API for testing
+import { vi } from 'vitest';
 
 export class Position {
   constructor(public line: number, public character: number) {}
@@ -24,15 +25,15 @@ export class OutputChannel {
 }
 
 export const languages = {
-  createDiagnosticCollection: () => new DiagnosticCollection(),
-  registerHoverProvider: () => ({ dispose: () => {} }),
-  registerCodeActionsProvider: () => ({ dispose: () => {} }),
+  createDiagnosticCollection: (name?: string) => new DiagnosticCollection(),
+  registerHoverProvider: (selector: any, provider: any) => ({ dispose: () => {} }),
+  registerCodeActionsProvider: (selector: any, provider: any, metadata?: any) => ({ dispose: () => {} }),
 };
 
-export const StatusBarAlignment = {
-  Left: 1,
-  Right: 2
-};
+export enum StatusBarAlignment {
+  Left = 1,
+  Right = 2
+}
 
 export class StatusBarItem {
   text: string = '';
@@ -49,7 +50,7 @@ export const window = {
   showWarningMessage: () => Promise.resolve(),
   showInformationMessage: () => Promise.resolve(),
   createOutputChannel: () => new OutputChannel(),
-  createStatusBarItem: () => new StatusBarItem(),
+  createStatusBarItem: (alignment?: StatusBarAlignment, priority?: number) => new StatusBarItem(),
   withProgress: (options: any, task: any) => task({ report: () => {} }),
   showTextDocument: () => Promise.resolve(),
 };
@@ -58,17 +59,17 @@ export const workspace = {
   findFiles: () => Promise.resolve([]),
   openTextDocument: () => Promise.resolve({}),
   textDocuments: [],
-  onDidChangeTextDocument: () => ({ dispose: () => {} }),
-  onDidOpenTextDocument: () => ({ dispose: () => {} }),
-  onDidSaveTextDocument: () => ({ dispose: () => {} }),
-  getConfiguration: () => ({
-    get: (key: string, defaultValue: any) => defaultValue
+  onDidChangeTextDocument: (listener: (e: any) => any) => ({ dispose: () => {} }),
+  onDidOpenTextDocument: (listener: (document: any) => any) => ({ dispose: () => {} }),
+  onDidSaveTextDocument: (listener: (document: any) => any) => ({ dispose: () => {} }),
+  getConfiguration: (section?: string) => ({
+    get: (key: string, defaultValue?: any) => defaultValue
   }),
-  asRelativePath: (uri: any) => uri,
+  asRelativePath: (pathOrUri: any) => pathOrUri,
 };
 
 export const commands = {
-  registerCommand: () => ({ dispose: () => {} }),
+  registerCommand: (command: string, callback: (...args: any[]) => any) => ({ dispose: () => {} }),
 };
 
 export const DiagnosticSeverity = {
@@ -119,3 +120,28 @@ export class MarkdownString {
     this.value = (this.value || '') + value;
   }
 }
+
+// Export everything as a module default for compatibility
+const vscode = {
+  Position,
+  Range,
+  DiagnosticCollection,
+  OutputChannel,
+  languages,
+  StatusBarAlignment,
+  StatusBarItem,
+  window,
+  workspace,
+  commands,
+  DiagnosticSeverity,
+  CodeActionKind,
+  ProgressLocation,
+  Uri,
+  Diagnostic,
+  CodeAction,
+  WorkspaceEdit,
+  Hover,
+  MarkdownString,
+};
+
+export default vscode;

@@ -205,71 +205,24 @@ export class JsParser {
    * @returns web-features ID or null
    */
   private static mapApiToFeatureId(apiPath: string): string | null {
-    // Common web platform API mappings
+    // Only flag APIs that are likely non-baseline or problematic
+    // Removed universally supported APIs to prevent false positives
     const apiMappings: Record<string, string> = {
-      // Navigator APIs
+      // Newer Navigator APIs that may not be baseline
       'navigator.clipboard': 'api.Clipboard',
-      'navigator.clipboard.writeText': 'api.Clipboard.writeText',
+      'navigator.clipboard.writeText': 'api.Clipboard.writeText', 
       'navigator.clipboard.readText': 'api.Clipboard.readText',
-      'navigator.geolocation': 'api.Geolocation',
-      'navigator.geolocation.getCurrentPosition': 'api.Geolocation.getCurrentPosition',
-      'navigator.serviceWorker': 'api.ServiceWorker',
-      'navigator.mediaDevices': 'api.MediaDevices',
-      'navigator.mediaDevices.getUserMedia': 'api.MediaDevices.getUserMedia',
-      'navigator.mediaDevices.getDisplayMedia': 'api.MediaDevices.getDisplayMedia',
       'navigator.share': 'api.Navigator.share',
       'navigator.vibrate': 'api.Navigator.vibrate',
+      'navigator.mediaDevices.getDisplayMedia': 'api.MediaDevices.getDisplayMedia',
       
-      // Document APIs
-      'document.querySelector': 'api.Document.querySelector',
-      'document.querySelectorAll': 'api.Document.querySelectorAll',
-      'document.getElementById': 'api.Document.getElementById',
-      'document.createElement': 'api.Document.createElement',
-      'document.addEventListener': 'api.EventTarget.addEventListener',
-      
-      // Window APIs
-      'window.fetch': 'api.fetch',
-      'window.requestAnimationFrame': 'api.Window.requestAnimationFrame',
-      'window.cancelAnimationFrame': 'api.Window.cancelAnimationFrame',
-      'window.localStorage': 'api.Storage',
-      'window.sessionStorage': 'api.Storage',
-      'window.indexedDB': 'api.IDBFactory',
-      
-      // Storage APIs
-      'localStorage.setItem': 'api.Storage',
-      'localStorage.getItem': 'api.Storage',
-      'sessionStorage.setItem': 'api.Storage',
-      'sessionStorage.getItem': 'api.Storage',
+      // IndexedDB - may not be baseline in all contexts
       'indexedDB.open': 'api.IDBFactory',
       
-      // Element APIs
-      'element.closest': 'api.Element.closest',
-      'element.matches': 'api.Element.matches',
-      'element.animate': 'api.Element.animate',
-      'element.scrollIntoView': 'api.Element.scrollIntoView',
-      'element.addEventListener': 'api.EventTarget.addEventListener',
-      
-      // Array methods (newer ones)
-      'Array.from': 'api.Array.from',
-      'Array.prototype.at': 'api.Array.at',
-      'Array.prototype.includes': 'api.Array.includes',
-      'Array.prototype.find': 'api.Array.find',
-      'Array.prototype.findIndex': 'api.Array.findIndex',
-      
-      // String methods
-      'String.prototype.includes': 'api.String.includes',
-      'String.prototype.startsWith': 'api.String.startsWith',
-      'String.prototype.endsWith': 'api.String.endsWith',
+      // Newer JavaScript features that might not be baseline
+      'Array.prototype.at': 'api.Array.at', // Check if this is baseline now
       'String.prototype.padStart': 'api.String.padStart',
       'String.prototype.padEnd': 'api.String.padEnd',
-      
-      // Object methods
-      'Object.assign': 'api.Object.assign',
-      'Object.entries': 'api.Object.entries',
-      'Object.keys': 'api.Object.keys',
-      'Object.values': 'api.Object.values',
-      
-      // Promise APIs
       'Promise.allSettled': 'api.Promise.allSettled',
       'Promise.any': 'api.Promise.any'
     };

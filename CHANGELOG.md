@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.0.1] - 2025-10-04 - Google Baseline Tooling Hackathon 2025
+## [0.0.1] - 2025-10-04 - Baseline Tooling Hackathon 2025
 
 ### 🏆 Hackathon Features
 

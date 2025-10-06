@@ -5,6 +5,7 @@ import { JsParser } from './core/jsParser';
 import { HtmlParser } from './core/htmlParser';
 import { ErrorHandler, Logger } from './core/errorHandler';
 import { PerformanceOptimizer } from './core/performanceOptimizer';
+import { BaselineScoreManager } from './gamification/scoreManager';
 
 /**
  * Enhanced diagnostic interface that includes feature ID in the code property
@@ -26,6 +27,7 @@ export class DiagnosticController {
   private errorHandler: ErrorHandler;
   private logger: Logger;
   private performanceOptimizer: PerformanceOptimizer;
+  private scoreManager: BaselineScoreManager;
   private debouncedUpdateDiagnostics: (document: vscode.TextDocument) => void;
 
   /**
@@ -39,6 +41,7 @@ export class DiagnosticController {
     this.errorHandler = ErrorHandler.getInstance();
     this.logger = Logger.getInstance();
     this.performanceOptimizer = PerformanceOptimizer.getInstance();
+    this.scoreManager = BaselineScoreManager.getInstance();
     
     // Create debounced version of updateDiagnostics
     this.debouncedUpdateDiagnostics = this.performanceOptimizer.debounce(
@@ -107,6 +110,9 @@ export class DiagnosticController {
           this.diagnosticCollection.set(document.uri, diagnostics);
           this.logger.debug(`Found ${diagnostics.length} compatibility issues in ${document.uri.fsPath}`);
         }
+        
+        // Calculate and update score based on diagnostics
+        await this.updateDocumentScore(document, diagnostics);
       } finally {
         // Release memory tracking
         this.performanceOptimizer.releaseMemoryTracking(operationId);
@@ -519,6 +525,127 @@ export class DiagnosticController {
       hash = hash & hash; // Convert to 32-bit integer
     }
     return hash.toString(36);
+  }
+
+  /**
+   * Updates the document score based on current diagnostics
+   * @param document VS Code document
+   * @param diagnostics Array of diagnostics for the document
+   */
+  private async updateDocumentScore(document: vscode.TextDocument, diagnostics: EnhancedDiagnostic[]): Promise<void> {
+    try {
+      // Analyze the document content to get all features (baseline and non-baseline)
+      const allFeatures = await this.getAllDocumentFeatures(document);
+      const nonBaselineFeatureIds = new Set(diagnostics.map(d => d.code.value));
+      
+      // Separate baseline and non-baseline features
+      const baselineFeatures: any[] = [];
+      const nonBaselineFeatures: any[] = [];
+      
+      for (const featureId of allFeatures) {
+        const featureData = this.baselineDataManager.getFeatureData(featureId);
+        
+        if (nonBaselineFeatureIds.has(featureId)) {
+          nonBaselineFeatures.push({
+            name: featureData?.name || featureId,
+            type: this.getFeatureType(document.languageId),
+            severity: this.getFeatureSeverity(featureId),
+            reason: `Not baseline compatible: ${featureData?.name || featureId}`,
+            alternatives: []
+          });
+        } else {
+          baselineFeatures.push({
+            name: featureData?.name || featureId,
+            type: this.getFeatureType(document.languageId),
+            confidence: 1.0
+          });
+        }
+      }
+      
+      const features = {
+        baseline: baselineFeatures,
+        nonBaseline: nonBaselineFeatures
+      };
+      
+      // Calculate score for this file
+      const fileScore = this.scoreManager.calculateFileScore(document.uri, features);
+      
+      // Get all workspace file scores and recalculate workspace score
+      const workspaceScores = [fileScore]; // In a full implementation, you'd collect all file scores
+      await this.scoreManager.calculateWorkspaceScore(workspaceScores);
+      
+    } catch (error) {
+      this.errorHandler.handleExtensionError(
+        error instanceof Error ? error : new Error('Unknown error updating document score'),
+        `Updating score for ${document.uri.fsPath}`
+      );
+    }
+  }
+
+  /**
+   * Gets all features used in a document (both baseline and non-baseline)
+   */
+  private async getAllDocumentFeatures(document: vscode.TextDocument): Promise<string[]> {
+    const content = document.getText();
+    const features: string[] = [];
+    
+    try {
+      switch (document.languageId) {
+        case 'css':
+        case 'scss':
+        case 'sass':
+        case 'less':
+          const cssResult = CssParser.parseCss(content, document);
+          features.push(...cssResult.features);
+          break;
+        case 'javascript':
+        case 'typescript':
+        case 'javascriptreact':
+        case 'typescriptreact':
+          const jsResult = JsParser.parseJavaScript(content, document);
+          features.push(...jsResult.features);
+          break;
+        case 'html':
+        case 'xml':
+          const htmlResult = HtmlParser.parseHtml(content, document);
+          features.push(...htmlResult.features);
+          break;
+      }
+    } catch (error) {
+      this.logger.warn(`Error getting all features for ${document.uri.fsPath}: ${error}`);
+    }
+    
+    return features;
+  }
+
+  /**
+   * Maps VS Code language ID to feature type
+   */
+  private getFeatureType(languageId: string): 'css' | 'html' | 'javascript' {
+    if (['css', 'scss', 'sass', 'less'].includes(languageId)) {
+      return 'css';
+    }
+    if (['javascript', 'typescript', 'javascriptreact', 'typescriptreact'].includes(languageId)) {
+      return 'javascript';
+    }
+    return 'html';
+  }
+
+  /**
+   * Determines feature severity based on baseline data
+   */
+  private getFeatureSeverity(featureId: string): 'low' | 'medium' | 'high' {
+    const featureData = this.baselineDataManager.getFeatureData(featureId);
+    
+    // Simple heuristic - can be improved with more detailed baseline data
+    if (featureId.includes('webkit') || featureId.includes('moz') || featureId.includes('ms')) {
+      return 'high'; // Vendor prefixes are high severity
+    }
+    if (featureData && !featureData.status.baseline) {
+      return 'high';
+    }
+    
+    return 'medium';
   }
 
   /**

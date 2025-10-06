@@ -9,6 +9,7 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts'],
     exclude: ['out/**/*', 'node_modules/**/*'],
+    setupFiles: ['./src/test-setup.ts'],
   },
   resolve: {
     alias: {

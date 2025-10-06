@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML Baseline Test</title>
+</head>
+<body>
+    <!-- These should NOT be flagged (baseline elements) -->
+    <div class="container">
+        <h1>Test Page</h1>
+        <p>This is a test paragraph.</p>
+        <img src="test.jpg" alt="Test image">
+        <a href="#test">Test link</a>
+    </div>
+
+    <!-- These SHOULD be flagged (potentially non-baseline) -->
+    <dialog open>
+        <p>This is a dialog element!</p>
+        <button>Close</button>
+    </dialog>
+
+    <details>
+        <summary>Click to expand</summary>
+        <p>Hidden content here</p>
+    </details>
+
+    <template id="my-template">
+        <p>Template content</p>
+    </template>
+
+    <!-- Input types that should be flagged -->
+    <form>
+        <!-- These should NOT be flagged -->
+        <input type="text" placeholder="Regular text input">
+        <input type="password" placeholder="Password">
+        <input type="submit" value="Submit">
+
+        <!-- These SHOULD be flagged -->
+        <input type="color" value="#ff0000">
+        <input type="date" value="2025-01-01">
+        <input type="email" placeholder="email@example.com">
+        <input type="number" min="1" max="100">
+        <input type="range" min="0" max="100" value="50">
+        <input type="search" placeholder="Search...">
+        <input type="url" placeholder="https://example.com">
+    </form>
+
+    <!-- Custom elements should be flagged -->
+    <custom-header>Custom Header</custom-header>
+    <my-component data-value="test">
+        <slot name="content">Slot content</slot>
+    </my-component>
+
+    <!-- Progress and meter should be flagged -->
+    <progress value="70" max="100">70%</progress>
+    <meter value="0.7">70%</meter>
+</body>
+</html>

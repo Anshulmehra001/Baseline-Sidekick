@@ -31,10 +31,21 @@ vi.mock('vscode', () => ({
   Uri: {
     parse: vi.fn((url: string) => ({ toString: () => url }))
   },
+  StatusBarAlignment: {
+    Left: 1,
+    Right: 2
+  },
   window: {
     createOutputChannel: vi.fn(() => ({
       appendLine: vi.fn(),
       show: vi.fn(),
+      dispose: vi.fn()
+    })),
+    createStatusBarItem: vi.fn(() => ({
+      text: '',
+      tooltip: '',
+      show: vi.fn(),
+      hide: vi.fn(),
       dispose: vi.fn()
     })),
     showErrorMessage: vi.fn().mockResolvedValue(undefined),

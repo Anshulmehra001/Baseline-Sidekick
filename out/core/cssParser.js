@@ -120,19 +120,31 @@ class CssParser {
         // Format: css.properties.{property-name}
         if (!normalizedProperty || /\s/.test(normalizedProperty))
             return null;
-        // Comprehensive allowlist for integration testing
-        const known = new Set([
-            'gap', 'grid', 'color', 'float', 'display', 'position', 'flex', 'align-items',
-            'justify-content', 'backdrop-filter', 'grid-template-columns', 'grid-template-rows',
-            'grid-area', 'flex-direction', 'flex-wrap', 'align-content', 'border-radius',
-            'box-shadow', 'transform', 'transition', 'animation', 'filter', 'opacity',
-            'background', 'margin', 'padding', 'width', 'height', 'font-size', 'font-family',
-            'text-align', 'text-decoration', 'line-height', 'border', 'outline', 'cursor',
-            'container-type', 'aspect-ratio', 'scroll-behavior', 'scroll-snap-type', 'overscroll-behavior',
-            'place-items', 'place-content', 'object-fit', 'object-position', 'will-change',
-            'touch-action', 'view-transition-name'
+        // Only flag properties that are actually problematic for baseline
+        // Basic layout properties like display, padding, margin are universally baseline
+        const nonBaselineProperties = new Set([
+            'float',
+            'clear',
+            'container-type',
+            'aspect-ratio',
+            'scroll-behavior',
+            'scroll-snap-type',
+            'overscroll-behavior',
+            'backdrop-filter',
+            'view-transition-name',
+            'touch-action',
+            'will-change' // Performance hint, may not be baseline
         ]);
-        return known.has(normalizedProperty) ? `css.properties.${normalizedProperty}` : null;
+        // Only return feature IDs for properties we want to check
+        // This prevents false positives on universally supported properties
+        if (nonBaselineProperties.has(normalizedProperty)) {
+            return `css.properties.${normalizedProperty}`;
+        }
+        // Also check vendor prefixed properties - these are definitely non-baseline
+        if (property !== normalizedProperty) {
+            return `css.properties.${property}`; // Return original with prefix
+        }
+        return null; // Skip checking baseline properties like display, padding, etc.
     }
     /**
      * Maps CSS at-rules to web-features IDs

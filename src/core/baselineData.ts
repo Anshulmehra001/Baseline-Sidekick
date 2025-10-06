@@ -151,11 +151,19 @@ export class BaselineDataManager {
       
       let result: boolean;
       if (!featureData) {
-        result = false;
+        // If feature doesn't exist in web-features data, assume it's baseline
+        // This prevents false positives on universal properties like 'display', 'padding'
+        console.log(`[Baseline Sidekick] Feature not found in database, assuming baseline: ${featureId}`);
+        result = true;
       } else {
         // A feature is Baseline supported if status.baseline is true, 'high', or 'low'
         const baseline = featureData.status.baseline;
         result = baseline === true || baseline === 'high' || baseline === 'low';
+        
+        // Debug logging for development
+        if (!result) {
+          console.log(`[Baseline Sidekick] Non-baseline feature detected: ${featureId}, status:`, featureData.status);
+        }
       }
 
       // Cache the result
@@ -164,7 +172,7 @@ export class BaselineDataManager {
       return result;
     } catch (error) {
       this.errorHandler.handleUnknownError(error instanceof Error ? error : new Error('Unknown error in isBaselineSupported'), 'Checking baseline support');
-      return false;
+      return true; // Default to baseline on error to prevent false positives
     }
   }
 

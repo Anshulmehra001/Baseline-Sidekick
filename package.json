@@ -1,7 +1,7 @@
 {
   "name": "baseline-sidekick",
   "displayName": "Baseline Sidekick",
-  "description": "AI-powered baseline compatibility assistant for VS Code - Google Baseline Tooling Hackathon 2025",
+  "description": "AI-powered baseline compatibility assistant for VS Code - Baseline Tooling Hackathon 2025",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.74.0"
@@ -31,10 +31,9 @@
     "hackathon",
     "google"
   ],
-  "author": "Anshulmehra001",
+  "author": "Aniket Mehra & Apoorv Bhargava",
   "publisher": "Anshulmehra001",
-  "license": "UNLICENSED",
-  "private": true,
+  "license": "MIT",
   "homepage": "https://github.com/Anshulmehra001/baseline-sidekick#readme",
   "repository": {
     "type": "git",

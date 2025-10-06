@@ -32,14 +32,15 @@ class OutputChannel {
 }
 exports.OutputChannel = OutputChannel;
 exports.languages = {
-    createDiagnosticCollection: () => new DiagnosticCollection(),
-    registerHoverProvider: () => ({ dispose: () => { } }),
-    registerCodeActionsProvider: () => ({ dispose: () => { } }),
+    createDiagnosticCollection: (name) => new DiagnosticCollection(),
+    registerHoverProvider: (selector, provider) => ({ dispose: () => { } }),
+    registerCodeActionsProvider: (selector, provider, metadata) => ({ dispose: () => { } }),
 };
-exports.StatusBarAlignment = {
-    Left: 1,
-    Right: 2
-};
+var StatusBarAlignment;
+(function (StatusBarAlignment) {
+    StatusBarAlignment[StatusBarAlignment["Left"] = 1] = "Left";
+    StatusBarAlignment[StatusBarAlignment["Right"] = 2] = "Right";
+})(StatusBarAlignment = exports.StatusBarAlignment || (exports.StatusBarAlignment = {}));
 class StatusBarItem {
     constructor() {
         this.text = '';
@@ -56,7 +57,7 @@ exports.window = {
     showWarningMessage: () => Promise.resolve(),
     showInformationMessage: () => Promise.resolve(),
     createOutputChannel: () => new OutputChannel(),
-    createStatusBarItem: () => new StatusBarItem(),
+    createStatusBarItem: (alignment, priority) => new StatusBarItem(),
     withProgress: (options, task) => task({ report: () => { } }),
     showTextDocument: () => Promise.resolve(),
 };
@@ -64,16 +65,16 @@ exports.workspace = {
     findFiles: () => Promise.resolve([]),
     openTextDocument: () => Promise.resolve({}),
     textDocuments: [],
-    onDidChangeTextDocument: () => ({ dispose: () => { } }),
-    onDidOpenTextDocument: () => ({ dispose: () => { } }),
-    onDidSaveTextDocument: () => ({ dispose: () => { } }),
-    getConfiguration: () => ({
+    onDidChangeTextDocument: (listener) => ({ dispose: () => { } }),
+    onDidOpenTextDocument: (listener) => ({ dispose: () => { } }),
+    onDidSaveTextDocument: (listener) => ({ dispose: () => { } }),
+    getConfiguration: (section) => ({
         get: (key, defaultValue) => defaultValue
     }),
-    asRelativePath: (uri) => uri,
+    asRelativePath: (pathOrUri) => pathOrUri,
 };
 exports.commands = {
-    registerCommand: () => ({ dispose: () => { } }),
+    registerCommand: (command, callback) => ({ dispose: () => { } }),
 };
 exports.DiagnosticSeverity = {
     Error: 0,
