@@ -77,7 +77,8 @@ Once installed, open any CSS, JS, or HTML file. The extension will start working
   /* ✅ 'display: grid' is Baseline and will have no warnings */
   display: grid;
   gap: 1rem;
-} ```
+} 
+```
 
 
 Hover over float to see compatibility details, and click the lightbulb icon (💡) to see the AI-powered Quick Fixes!
